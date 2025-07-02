@@ -1,5 +1,8 @@
+"use client";
+
 import React, { useState } from 'react';
 import { Github, ExternalLink, Mail, Linkedin, Code, Database, Globe, Smartphone, ChevronRight, Menu, X, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { portfolioApi } from './lib/api';
 
 const Portfolio = () => {
   const [activeSection, setActiveSection] = useState('home');

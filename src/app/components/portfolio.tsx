@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Github, ExternalLink, Mail, Linkedin, Code, Database, Globe, Smartphone, ChevronRight, Menu, X, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { portfolioApi } from './lib/api'; // Adjust the import path as necessary
 
 const Portfolio = () => {
   const [activeSection, setActiveSection] = useState('home');
@@ -67,63 +68,48 @@ const Portfolio = () => {
 
   // Fetch data from API
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch projects
-        const projectsRes = await fetch(`${API_BASE}/api/projects`);
-        if (projectsRes.ok) {
-          const projectsData = await projectsRes.json();
-          setProjects(projectsData);
-        }
+  const fetchData = async () => {
+    try {
+      // Fetch projects
+      const projectsData = await portfolioApi.getProjects();
+      setProjects(projectsData);
 
-        // Fetch skills
-        const skillsRes = await fetch(`${API_BASE}/api/skills`);
-        if (skillsRes.ok) {
-          const skillsData = await skillsRes.json();
-          setSkills(skillsData.map(skill => ({
-            name: skill.name,
-            icon: getSkillIcon(skill.name),
-            techs: skill.technologies
-          })));
-        }
+      // Fetch skills  
+      const skillsData = await portfolioApi.getSkills();
+      setSkills(skillsData.map(skill => ({
+        name: skill.name,
+        icon: getSkillIcon(skill.name),
+        techs: skill.technologies
+      })));
 
-        // Fetch analytics
-        const analyticsRes = await fetch(`${API_BASE}/api/analytics/views`);
-        if (analyticsRes.ok) {
-          const analyticsData = await analyticsRes.json();
-          setAnalytics(analyticsData);
-        }
+      // Fetch analytics
+      const analyticsData = await portfolioApi.getAnalytics();
+      setAnalytics(analyticsData);
 
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        // Fallback to default data if API fails
-        setProjects(getDefaultProjects());
-        setSkills(getDefaultSkills());
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      // Fallback to default data if API fails
+      setProjects(getDefaultProjects());
+      setSkills(getDefaultSkills());
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    fetchData();
-  }, []);
+  fetchData();
+}, []);
 
   // Track project views
   const trackProjectView = async (projectId, projectTitle) => {
-    try {
-      await fetch(`${API_BASE}/api/projects/${projectId}/view`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          project_name: projectTitle,
-          user_ip: null
-        })
-      });
-    } catch (error) {
-      console.error('Error tracking project view:', error);
-    }
-  };
+  try {
+    await portfolioApi.trackView(projectId, {
+      project_name: projectTitle,
+      user_ip: null
+    });
+  } catch (error) {
+    console.error('Error tracking project view:', error);
+  }
+};
 
   // Handle contact form submission
   const handleContactSubmit = async () => {
@@ -140,35 +126,22 @@ const Portfolio = () => {
     setContactStatus({ type: '', message: '' });
 
     try {
-      const response = await fetch(`${API_BASE}/api/contact`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(contactForm)
-      });
-
-      if (response.ok) {
-        setContactStatus({
-          type: 'success',
-          message: 'Message sent successfully! I\'ll get back to you soon.'
-        });
-        setContactForm({ name: '', email: '', message: '' });
-      } else {
-        setContactStatus({
-          type: 'error',
-          message: 'Failed to send message. Please try again.'
-        });
-      }
-    } catch (error) {
-      setContactStatus({
-        type: 'error',
-        message: 'Network error. Please check your connection and try again.'
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const result = await portfolioApi.submitContact(contactForm);
+  
+  setContactStatus({
+    type: 'success',
+    message: 'Message sent successfully! I\'ll get back to you soon.'
+  });
+  setContactForm({ name: '', email: '', message: '' });
+} catch (error) {
+  console.error('Contact submission error:', error);
+  setContactStatus({
+    type: 'error',
+    message: 'Failed to send message. Please try again.'
+  });
+} finally {
+  setIsSubmitting(false);
+}
 
   // Handle contact form input changes
   const handleContactChange = (e) => {
