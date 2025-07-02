@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Github, ExternalLink, Mail, Linkedin, Code, Database, Globe, Smartphone, ChevronRight, Menu, X, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
-import { portfolioApi } from './lib/api'; // Adjust the import path as necessary
+import { portfolioApi } from './lib/api';
+
+
 
 const Portfolio = () => {
   const [activeSection, setActiveSection] = useState('home');
@@ -18,8 +20,9 @@ const Portfolio = () => {
   });
   const [contactStatus, setContactStatus] = useState({ type: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  // const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 
   // Helper function to get skill icons
@@ -142,7 +145,7 @@ const Portfolio = () => {
 } finally {
   setIsSubmitting(false);
 }
-
+};
   // Handle contact form input changes
   const handleContactChange = (e) => {
     setContactForm({
