@@ -498,7 +498,7 @@ const Portfolio = () => {
             </div>
             <div className="space-y-6">
               <p className="text-lg text-slate-300 leading-relaxed">
-                I'm a passionate full-stack developer with expertise in modern
+                I am a passionate full-stack developer with expertise in modern
                 web technologies. I love creating efficient, scalable
                 applications that solve real-world problems and deliver
                 exceptional user experiences.
@@ -506,12 +506,12 @@ const Portfolio = () => {
               <p className="text-lg text-slate-300 leading-relaxed">
                 My journey in tech started with curiosity about how things work,
                 and has evolved into a deep understanding of both frontend and
-                backend development. I'm particularly interested in fintech,
+                backend development. I am particularly interested in fintech,
                 market analysis, and creating user-friendly interfaces that make
                 complex data accessible.
               </p>
               <p className="text-lg text-slate-300 leading-relaxed">
-                When I'm not coding, you can find me exploring new technologies,
+                When I am not coding, you can find me exploring new technologies,
                 contributing to open-source projects, or mentoring aspiring
                 developers in my community.
               </p>
@@ -547,7 +547,7 @@ const Portfolio = () => {
                 Coming Soon
               </h3>
               <p className="text-lg text-slate-300 mb-6">
-                I'm currently working on showcasing my professional experience
+                I am currently working on showcasing my professional experience
                 in an interactive and engaging way.
               </p>
               <div className="flex items-center justify-center space-x-2 text-purple-300">
@@ -711,7 +711,7 @@ const Portfolio = () => {
       >
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-8 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Let's Connect
+            Let us Connect
           </h2>
           <p className="text-xl text-slate-300 mb-12">
             I'm always open to discussing new opportunities, interesting
