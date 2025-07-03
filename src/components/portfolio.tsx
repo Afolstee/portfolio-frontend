@@ -86,10 +86,11 @@ const Portfolio = () => {
     email: "",
     message: "",
   });
-  const [contactStatus, setContactStatus] = useState<ContactStatus>({ type: "", message: "" });
+  const [contactStatus, setContactStatus] = useState<ContactStatus>({
+    type: "",
+    message: "",
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
   // Handle scroll to show/hide scroll to top button and update active section
   useEffect(() => {
@@ -208,12 +209,14 @@ const Portfolio = () => {
         // Fetch skills
         const skillsData: ApiSkill[] = await portfolioApi.getSkills();
         setSkills(
-          skillsData.map((skill: ApiSkill): Skill => ({
-            name: skill.name,
-            icon: getSkillIcon(skill.name),
-            techs: skill.technologies,
-            proficiency: skill.proficiency || 85, // Default proficiency if not provided
-          }))
+          skillsData.map(
+            (skill: ApiSkill): Skill => ({
+              name: skill.name,
+              icon: getSkillIcon(skill.name),
+              techs: skill.technologies,
+              proficiency: skill.proficiency || 85, // Default proficiency if not provided
+            })
+          )
         );
 
         // Fetch analytics
@@ -269,7 +272,9 @@ const Portfolio = () => {
 
       setContactStatus({
         type: "success",
-        message: "Message sent successfully! I'll get back to you soon.",
+        message:
+          result.message ||
+          "Message sent successfully! I'll get back to you soon.",
       });
       setContactForm({ name: "", email: "", message: "" });
     } catch (error) {
@@ -284,7 +289,9 @@ const Portfolio = () => {
   };
 
   // Handle contact form input changes
-  const handleContactChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleContactChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setContactForm({
       ...contactForm,
       [e.target.name]: e.target.value,
@@ -511,9 +518,9 @@ const Portfolio = () => {
                 complex data accessible.
               </p>
               <p className="text-lg text-slate-300 leading-relaxed">
-                When I am not coding, you can find me exploring new technologies,
-                contributing to open-source projects, or mentoring aspiring
-                developers in my community.
+                When I am not coding, you can find me exploring new
+                technologies, contributing to open-source projects, or mentoring
+                aspiring developers in my community.
               </p>
               <div className="flex flex-wrap gap-4">
                 <span className="bg-purple-600/20 text-purple-300 px-4 py-2 rounded-full text-sm border border-purple-600/30">
@@ -605,12 +612,14 @@ const Portfolio = () => {
                     Key Features:
                   </h4>
                   <ul className="text-xs text-slate-400 space-y-1">
-                    {(project.features || []).map((feature: string, idx: number) => (
-                      <li key={idx} className="flex items-center">
-                        <ChevronRight className="w-3 h-3 mr-1 text-purple-400" />
-                        {feature}
-                      </li>
-                    ))}
+                    {(project.features || []).map(
+                      (feature: string, idx: number) => (
+                        <li key={idx} className="flex items-center">
+                          <ChevronRight className="w-3 h-3 mr-1 text-purple-400" />
+                          {feature}
+                        </li>
+                      )
+                    )}
                   </ul>
                 </div>
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -631,9 +640,7 @@ const Portfolio = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center text-sm text-purple-300 hover:text-purple-200 transition-colors"
-                    onClick={() =>
-                      trackProjectView(project.id, project.title)
-                    }
+                    onClick={() => trackProjectView(project.id, project.title)}
                   >
                     <Github className="w-4 h-4 mr-1" />
                     Code
@@ -643,9 +650,7 @@ const Portfolio = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center text-sm text-purple-300 hover:text-purple-200 transition-colors"
-                    onClick={() =>
-                      trackProjectView(project.id, project.title)
-                    }
+                    onClick={() => trackProjectView(project.id, project.title)}
                   >
                     <ExternalLink className="w-4 h-4 mr-1" />
                     Live Demo
@@ -714,7 +719,7 @@ const Portfolio = () => {
             Let us Connect
           </h2>
           <p className="text-xl text-slate-300 mb-12">
-            I'm always open to discussing new opportunities, interesting
+            I am always open to discussing new opportunities, interesting
             projects, and innovative ideas
           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-8 mb-12">
