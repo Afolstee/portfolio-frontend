@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -21,6 +20,7 @@ import {
   Star,
   ArrowUp,
 } from "lucide-react";
+import { portfolioApi } from "../lib/api";
 
 interface Project {
   id: number;
@@ -65,14 +65,23 @@ interface ContactStatus {
   message: string;
 }
 
+interface ApiSkill {
+  name: string;
+  technologies: string[];
+  proficiency?: number;
+}
+
 const Portfolio = () => {
   const [activeSection, setActiveSection] = useState("home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [scrollTimeout, setScrollTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [scrollTimeout, setScrollTimeout] = useState<NodeJS.Timeout | null>(
+    null
+  );
   const [contactForm, setContactForm] = useState<ContactForm>({
     name: "",
     email: "",
@@ -84,7 +93,7 @@ const Portfolio = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Handle scroll to show/hide scroll to top button with auto-hide after 3 seconds
+  // Handle scroll to show/hide scroll to top button and update active section
   useEffect(() => {
     const handleScroll = () => {
       const shouldShow = window.scrollY > 300;
@@ -95,15 +104,16 @@ const Portfolio = () => {
         clearTimeout(scrollTimeout);
       }
 
-      // Set new timeout to hide button after 3 seconds of no scrolling
+      // Only set timeout if button should be shown
       if (shouldShow) {
+        // Set new timeout to hide button after 2 seconds of no scrolling
         const newTimeout = setTimeout(() => {
           setShowScrollTop(false);
-        }, 3000);
+        }, 2000);
+
         setScrollTimeout(newTimeout);
       }
 
-      // Update active section based on scroll position
       const sections = [
         "home",
         "about",
@@ -127,6 +137,8 @@ const Portfolio = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
+
+    // Cleanup function
     return () => {
       window.removeEventListener("scroll", handleScroll);
       if (scrollTimeout) {
@@ -134,6 +146,21 @@ const Portfolio = () => {
       }
     };
   }, [scrollTimeout]);
+
+  // Helper function to get skill icons
+  const getSkillIcon = (skillName: string): React.ReactElement => {
+    const iconMap: { [key: string]: React.ReactElement } = {
+      "Frontend Development": <Globe className="w-6 h-6" />,
+      "Backend Development": <Database className="w-6 h-6" />,
+      "Database & Storage": <Database className="w-6 h-6" />,
+      "DevOps & Tools": <Code className="w-6 h-6" />,
+      Mobile: <Smartphone className="w-6 h-6" />,
+      Frontend: <Globe className="w-6 h-6" />,
+      Backend: <Database className="w-6 h-6" />,
+      Tools: <Code className="w-6 h-6" />,
+    };
+    return iconMap[skillName] || <Code className="w-6 h-6" />;
+  };
 
   // Fallback data in case API fails
   const getDefaultProjects = (): Project[] => [
@@ -194,17 +221,60 @@ const Portfolio = () => {
     },
   ];
 
-  // Initialize with default data
+  // Fetch data from API
   useEffect(() => {
-    setProjects(getDefaultProjects());
-    setSkills(getDefaultSkills());
-    setAnalytics({
-      total_views: 1234,
-      monthly_views: 256,
-      projects_count: 2,
-      years_experience: 3,
-    });
+    const fetchData = async () => {
+      try {
+        // Fetch projects
+        const projectsData = await portfolioApi.getProjects();
+        setProjects(projectsData);
+
+        // Fetch skills
+        const skillsData: ApiSkill[] = await portfolioApi.getSkills();
+        setSkills(
+          skillsData.map(
+            (skill: ApiSkill): Skill => ({
+              name: skill.name,
+              icon: getSkillIcon(skill.name),
+              techs: skill.technologies,
+              proficiency: skill.proficiency || 85, // Default proficiency if not provided
+            })
+          )
+        );
+
+        // Fetch analytics
+        const analyticsData = await portfolioApi.getAnalytics();
+        setAnalytics(analyticsData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        // Fallback to default data if API fails
+        setProjects(getDefaultProjects());
+        setSkills(getDefaultSkills());
+        setAnalytics({
+          total_views: 0,
+          monthly_views: 0,
+          projects_count: 2,
+          years_experience: 3,
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
+
+  // Track project views
+  const trackProjectView = async (projectId: number, projectTitle: string) => {
+    try {
+      await portfolioApi.trackView(projectId, {
+        project_name: projectTitle,
+        user_ip: null,
+      });
+    } catch (error) {
+      console.error("Error tracking project view:", error);
+    }
+  };
 
   // Handle contact form submission
   const handleContactSubmit = async () => {
@@ -221,12 +291,13 @@ const Portfolio = () => {
     setContactStatus({ type: "", message: "" });
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      const result = await portfolioApi.submitContact(contactForm);
+
       setContactStatus({
         type: "success",
-        message: "Message sent successfully! I'll get back to you soon.",
+        message:
+          result.message ||
+          "Message sent successfully! I'll get back to you soon.",
       });
       setContactForm({ name: "", email: "", message: "" });
     } catch (error) {
@@ -252,6 +323,15 @@ const Portfolio = () => {
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+
+    // Clear timeout when button is clicked
+    if (scrollTimeout) {
+      clearTimeout(scrollTimeout);
+      setScrollTimeout(null);
+    }
+
+    // Hide button immediately after clicking
+    setShowScrollTop(false);
   };
 
   const scrollToSection = (sectionId: string) => {
@@ -349,11 +429,11 @@ const Portfolio = () => {
         )}
       </nav>
 
-      {/* Scroll to Top Button with auto-hide after 3 seconds */}
+      {/* Scroll to Top Button */}
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 z-50 animate-pulse"
+          className="fixed bottom-8 right-8 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 z-50"
         >
           <ArrowUp className="w-5 h-5" />
         </button>
@@ -691,6 +771,7 @@ const Portfolio = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center text-sm text-purple-300 hover:text-purple-200 transition-colors"
+                    onClick={() => trackProjectView(project.id, project.title)}
                   >
                     <Github className="w-4 h-4 mr-1" />
                     Code
@@ -700,6 +781,7 @@ const Portfolio = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center text-sm text-purple-300 hover:text-purple-200 transition-colors"
+                    onClick={() => trackProjectView(project.id, project.title)}
                   >
                     <ExternalLink className="w-4 h-4 mr-1" />
                     Live Demo
