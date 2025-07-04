@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -17,7 +18,6 @@ import {
   CheckCircle,
   Loader2,
   Download,
-  Calendar,
   Star,
   ArrowUp,
 } from "lucide-react";
@@ -65,18 +65,11 @@ interface ContactStatus {
   message: string;
 }
 
-interface ApiSkill {
-  name: string;
-  technologies: string[];
-  proficiency?: number;
-}
-
 const Portfolio = () => {
   const [activeSection, setActiveSection] = useState("home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [scrollTimeout, setScrollTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
@@ -141,21 +134,6 @@ const Portfolio = () => {
       }
     };
   }, [scrollTimeout]);
-
-  // Helper function to get skill icons
-  const getSkillIcon = (skillName: string): React.ReactElement => {
-    const iconMap: { [key: string]: React.ReactElement } = {
-      "Frontend Development": <Globe className="w-6 h-6" />,
-      "Backend Development": <Database className="w-6 h-6" />,
-      "Database & Storage": <Database className="w-6 h-6" />,
-      "DevOps & Tools": <Code className="w-6 h-6" />,
-      Mobile: <Smartphone className="w-6 h-6" />,
-      Frontend: <Globe className="w-6 h-6" />,
-      Backend: <Database className="w-6 h-6" />,
-      Tools: <Code className="w-6 h-6" />,
-    };
-    return iconMap[skillName] || <Code className="w-6 h-6" />;
-  };
 
   // Fallback data in case API fails
   const getDefaultProjects = (): Project[] => [
