@@ -21,9 +21,7 @@ import {
   Star,
   ArrowUp,
 } from "lucide-react";
-import { portfolioApi } from "../lib/api";
 
-// Type definitions
 interface Project {
   id: number;
   title: string;
@@ -77,7 +75,8 @@ const Portfolio = () => {
   const [activeSection, setActiveSection] = useState("home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [scrollTimeout, setScrollTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
@@ -92,10 +91,24 @@ const Portfolio = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Handle scroll to show/hide scroll to top button and update active section
+  // Handle scroll to show/hide scroll to top button with auto-hide after 3 seconds
   useEffect(() => {
     const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 300);
+      const shouldShow = window.scrollY > 300;
+      setShowScrollTop(shouldShow);
+
+      // Clear existing timeout
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+
+      // Set new timeout to hide button after 3 seconds of no scrolling
+      if (shouldShow) {
+        const newTimeout = setTimeout(() => {
+          setShowScrollTop(false);
+        }, 3000);
+        setScrollTimeout(newTimeout);
+      }
 
       // Update active section based on scroll position
       const sections = [
@@ -121,8 +134,13 @@ const Portfolio = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+    };
+  }, [scrollTimeout]);
 
   // Helper function to get skill icons
   const getSkillIcon = (skillName: string): React.ReactElement => {
@@ -198,60 +216,17 @@ const Portfolio = () => {
     },
   ];
 
-  // Fetch data from API
+  // Initialize with default data
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch projects
-        const projectsData = await portfolioApi.getProjects();
-        setProjects(projectsData);
-
-        // Fetch skills
-        const skillsData: ApiSkill[] = await portfolioApi.getSkills();
-        setSkills(
-          skillsData.map(
-            (skill: ApiSkill): Skill => ({
-              name: skill.name,
-              icon: getSkillIcon(skill.name),
-              techs: skill.technologies,
-              proficiency: skill.proficiency || 85, // Default proficiency if not provided
-            })
-          )
-        );
-
-        // Fetch analytics
-        const analyticsData = await portfolioApi.getAnalytics();
-        setAnalytics(analyticsData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        // Fallback to default data if API fails
-        setProjects(getDefaultProjects());
-        setSkills(getDefaultSkills());
-        setAnalytics({
-          total_views: 0,
-          monthly_views: 0,
-          projects_count: 2,
-          years_experience: 3,
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
+    setProjects(getDefaultProjects());
+    setSkills(getDefaultSkills());
+    setAnalytics({
+      total_views: 1234,
+      monthly_views: 256,
+      projects_count: 2,
+      years_experience: 3,
+    });
   }, []);
-
-  // Track project views
-  const trackProjectView = async (projectId: number, projectTitle: string) => {
-    try {
-      await portfolioApi.trackView(projectId, {
-        project_name: projectTitle,
-        user_ip: null,
-      });
-    } catch (error) {
-      console.error("Error tracking project view:", error);
-    }
-  };
 
   // Handle contact form submission
   const handleContactSubmit = async () => {
@@ -268,13 +243,12 @@ const Portfolio = () => {
     setContactStatus({ type: "", message: "" });
 
     try {
-      const result = await portfolioApi.submitContact(contactForm);
-
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
       setContactStatus({
         type: "success",
-        message:
-          result.message ||
-          "Message sent successfully! I'll get back to you soon.",
+        message: "Message sent successfully! I'll get back to you soon.",
       });
       setContactForm({ name: "", email: "", message: "" });
     } catch (error) {
@@ -311,10 +285,9 @@ const Portfolio = () => {
   };
 
   const downloadCV = () => {
-    // Simulated CV download - replace with actual CV file
     const link = document.createElement("a");
-    link.href = "/path-to-your-cv.pdf"; // Replace with actual CV path
-    link.download = "Portfolio_CV.pdf";
+    link.href = "/media/TemiladeAfolabiAResume.pdf";
+    link.download = "TemiladeAfolabi_CV.pdf";
     link.click();
   };
 
@@ -398,11 +371,11 @@ const Portfolio = () => {
         )}
       </nav>
 
-      {/* Scroll to Top Button */}
+      {/* Scroll to Top Button with auto-hide after 3 seconds */}
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 z-50"
+          className="fixed bottom-8 right-8 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 z-50 animate-pulse"
         >
           <ArrowUp className="w-5 h-5" />
         </button>
@@ -416,8 +389,11 @@ const Portfolio = () => {
         <div className="text-center max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-5xl md:text-7xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent animate-pulse">
-              Full Stack Developer
+              Afolabi Temilade A.
             </h1>
+            <h2 className="text-3xl md:text-4xl font-semibold mb-4 text-slate-200">
+              Full Stack Developer
+            </h2>
             <p className="text-xl md:text-2xl text-slate-300 mb-8">
               Building modern web applications with Python, Next.js, and
               cutting-edge technologies
@@ -505,17 +481,13 @@ const Portfolio = () => {
             </div>
             <div className="space-y-6">
               <p className="text-lg text-slate-300 leading-relaxed">
-                I am a passionate full-stack developer with expertise in modern
-                web technologies. I love creating efficient, scalable
-                applications that solve real-world problems and deliver
-                exceptional user experiences.
-              </p>
-              <p className="text-lg text-slate-300 leading-relaxed">
-                My journey in tech started with curiosity about how things work,
-                and has evolved into a deep understanding of both frontend and
-                backend development. I am particularly interested in fintech,
-                market analysis, and creating user-friendly interfaces that make
-                complex data accessible.
+                As a full-stack developer, I specialize in building
+                comprehensive web solutions using React and NextJS for frontend
+                development, along with Python and FastAPI for robust backend
+                systems. My proven track record of collaborating with
+                cross-functional teams and delivering high-quality applications
+                makes me a valuable asset to any organization seeking to elevate
+                their web development capabilities.
               </p>
               <p className="text-lg text-slate-300 leading-relaxed">
                 When I am not coding, you can find me exploring new
@@ -547,19 +519,120 @@ const Portfolio = () => {
           <h2 className="text-4xl font-bold mb-12 text-center bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
             Experience
           </h2>
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-12 border border-white/10 text-center">
-              <div className="text-6xl mb-6">🚀</div>
-              <h3 className="text-2xl font-semibold text-white mb-4">
-                Coming Soon
+          <div className="space-y-8">
+            {/* Frontend Engineer - Capriquota */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 hover:border-purple-400/30 transition-colors duration-300">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+                <div>
+                  <h3 className="text-2xl font-semibold text-white mb-4">
+                    Frontend Engineer
+                  </h3>
+                  <p className="text-purple-300 text-lg">Capriquota • Remote</p>
+                </div>
+                <div className="text-slate-300 mt-4 md:mt-0">
+                  January 2023 - August 2023
+                </div>
+              </div>
+              <ul className="space-y-4 text-slate-300">
+                <li className="flex items-start space-x-4">
+                  <span className="text-purple-400 mt-1">•</span>
+                  <span>
+                    Deployed server-side rendering (SSR) using Next.js to
+                    improve page load times by 10% and SEO performance
+                  </span>
+                </li>
+                <li className="flex items-start space-x-4">
+                  <span className="text-purple-400 mt-1">•</span>
+                  <span>
+                    Partnered with senior developers in reducing development
+                    time by 25%, making use of technologies like React.js
+                  </span>
+                </li>
+                <li className="flex items-start space-x-4">
+                  <span className="text-purple-400 mt-1">•</span>
+                  <span>
+                    Coordinated with the product design team to design and
+                    implement an intuitive user interface and achieved a 20%
+                    increase in user engagement
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Frontend Engineer Intern - Dev Career */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 hover:border-purple-400/30 transition-colors duration-300">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+                <div>
+                  <h3 className="text-2xl font-semibold text-white mb-4">
+                    Frontend Engineer Intern
+                  </h3>
+                  <p className="text-purple-300 text-lg">Dev Career • Ibadan</p>
+                </div>
+                <div className="text-slate-300 mt-4 md:mt-0">
+                  September 2022 - December 2022
+                </div>
+              </div>
+              <ul className="space-y-4 text-slate-300">
+                <li className="flex items-start space-x-4">
+                  <span className="text-purple-400 mt-1">•</span>
+                  <span>
+                    Worked jointly with senior developers to assist in
+                    developing responsive websites using HTML, CSS, and
+                    JavaScript
+                  </span>
+                </li>
+                <li className="flex items-start space-x-4">
+                  <span className="text-purple-400 mt-1">•</span>
+                  <span>
+                    Assisted in developing and maintaining front-end components
+                    of web applications using modern frameworks like React
+                  </span>
+                </li>
+                <li className="flex items-start space-x-4">
+                  <span className="text-purple-400 mt-1">•</span>
+                  <span>
+                    Collaborated with senior developers to develop responsive
+                    web applications that were optimized for different screen
+                    sizes
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Education Section */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 hover:border-purple-400/30 transition-colors duration-300">
+              <h3 className="text-2xl font-semibold text-white mb-8">
+                Education
               </h3>
-              <p className="text-lg text-slate-300 mb-6">
-                I am currently working on showcasing my professional experience
-                in an interactive and engaging way.
-              </p>
-              <div className="flex items-center justify-center space-x-2 text-purple-300">
-                <Calendar className="w-5 h-5" />
-                <span>Stay tuned for updates!</span>
+
+              <div className="space-y-8">
+                {/* Master Degree */}
+                <div className="relative pl-8 border-l-2 border-purple-400/30">
+                  <div className="absolute -left-2 top-0 w-4 h-4 bg-purple-400 rounded-full"></div>
+                  <div className="space-y-2">
+                    <h4 className="text-xl font-semibold text-white">
+                      Master Degree
+                    </h4>
+                    <p className="text-purple-300 text-lg">
+                      University of Ibadan, Nigeria
+                    </p>
+                    <p className="text-slate-400">2023 - 2025</p>
+                  </div>
+                </div>
+
+                {/* Bachelor Degree */}
+                <div className="relative pl-8 border-l-2 border-purple-400/30">
+                  <div className="absolute -left-2 top-0 w-4 h-4 bg-purple-400 rounded-full"></div>
+                  <div className="space-y-2">
+                    <h4 className="text-xl font-semibold text-white">
+                      Bachelor Degree
+                    </h4>
+                    <p className="text-purple-300 text-lg">
+                      University of Ibadan, Nigeria
+                    </p>
+                    <p className="text-slate-400">2018 - 2022</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -640,7 +713,6 @@ const Portfolio = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center text-sm text-purple-300 hover:text-purple-200 transition-colors"
-                    onClick={() => trackProjectView(project.id, project.title)}
                   >
                     <Github className="w-4 h-4 mr-1" />
                     Code
@@ -650,7 +722,6 @@ const Portfolio = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center text-sm text-purple-300 hover:text-purple-200 transition-colors"
-                    onClick={() => trackProjectView(project.id, project.title)}
                   >
                     <ExternalLink className="w-4 h-4 mr-1" />
                     Live Demo
@@ -826,7 +897,7 @@ const Portfolio = () => {
         <div className="max-w-7xl mx-auto px-4 text-center">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-slate-400">
-              © 2024 Portfolio. Built with React & Tailwind CSS
+              © Built with Next.JS, Python, FastAPI & Tailwind CSS
             </div>
             <div className="flex space-x-6">
               <a
@@ -852,9 +923,6 @@ const Portfolio = () => {
                 <Mail className="w-5 h-5" />
               </a>
             </div>
-          </div>
-          <div className="mt-8 text-sm text-slate-500">
-            <p>Crafted with ❤️ using modern web technologies</p>
           </div>
         </div>
       </footer>
