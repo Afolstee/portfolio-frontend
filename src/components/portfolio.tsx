@@ -20,6 +20,8 @@ import {
   Star,
   ArrowUp,
 } from "lucide-react";
+import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { sendEmail } from "../utils/replitmail";
 
 interface Project {
   id: number;
@@ -265,7 +267,20 @@ const Portfolio = () => {
     setContactStatus({ type: "", message: "" });
 
     try {
-      // Simulate successful contact form submission
+      // Send actual email using Replit Mail integration
+      await sendEmail({
+        to: "afolstee@gmail.com",
+        subject: `Portfolio Contact: ${contactForm.name}`,
+        text: `Name: ${contactForm.name}\nEmail: ${contactForm.email}\n\nMessage:\n${contactForm.message}`,
+        html: `
+          <h3>New Portfolio Contact Form Submission</h3>
+          <p><strong>Name:</strong> ${contactForm.name}</p>
+          <p><strong>Email:</strong> ${contactForm.email}</p>
+          <p><strong>Message:</strong></p>
+          <p>${contactForm.message.replace(/\n/g, '<br>')}</p>
+        `
+      });
+      
       const result = { message: "Message sent successfully! I'll get back to you soon." };
 
       setContactStatus({
@@ -335,9 +350,9 @@ const Portfolio = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white text-lg">Loading Portfolio...</p>
         </div>
       </div>
@@ -345,12 +360,12 @@ const Portfolio = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
       {/* Navigation */}
       <nav className="fixed top-0 w-full bg-black/20 backdrop-blur-lg z-50 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="font-bold text-xl bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <div className="font-bold text-xl bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
               Portfolio
             </div>
 
@@ -360,8 +375,8 @@ const Portfolio = () => {
                 <button
                   key={item}
                   onClick={() => scrollToSection(item)}
-                  className={`capitalize hover:text-purple-300 transition-colors ${
-                    activeSection === item ? "text-purple-300" : "text-white"
+                  className={`capitalize hover:text-blue-300 transition-colors ${
+                    activeSection === item ? "text-blue-300" : "text-white"
                   }`}
                 >
                   {item}
@@ -394,7 +409,7 @@ const Portfolio = () => {
                     scrollToSection(item);
                     setIsMenuOpen(false);
                   }}
-                  className="block px-3 py-2 text-base font-medium hover:text-purple-300 capitalize"
+                  className="block px-3 py-2 text-base font-medium hover:text-blue-300 capitalize"
                 >
                   {item}
                 </button>
@@ -408,20 +423,23 @@ const Portfolio = () => {
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 z-50"
+          className="fixed bottom-8 right-8 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 z-50"
         >
           <ArrowUp className="w-5 h-5" />
         </button>
       )}
 
       {/* Hero Section */}
-      <section
+      <motion.section
         id="home"
         className="min-h-screen flex items-center justify-center px-4 pt-16"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
       >
         <div className="text-center max-w-4xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-5xl md:text-7xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent animate-pulse">
+            <h1 className="text-5xl md:text-7xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-cyan-400 to-sky-400 bg-clip-text text-transparent animate-pulse">
               Afolabi Temilade A.
             </h1>
             <h2 className="text-3xl md:text-4xl font-semibold mb-4 text-slate-200">
@@ -434,20 +452,20 @@ const Portfolio = () => {
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 mb-12">
               <button
                 onClick={() => scrollToSection("projects")}
-                className="bg-purple-600 hover:bg-purple-700 px-8 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2"
+                className="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2"
               >
                 <span>View Projects</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
               <button
                 onClick={() => scrollToSection("contact")}
-                className="border border-purple-400 hover:bg-purple-400/10 px-8 py-3 rounded-lg font-semibold transition-colors"
+                className="border border-blue-400 hover:bg-blue-400/10 px-8 py-3 rounded-lg font-semibold transition-colors"
               >
                 Contact Me
               </button>
               <button
                 onClick={downloadCV}
-                className="bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 px-8 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2"
+                className="bg-gradient-to-r from-pink-600 to-blue-600 hover:from-pink-700 hover:to-blue-700 px-8 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2"
               >
                 <Download className="w-4 h-4" />
                 <span>Download CV</span>
@@ -456,33 +474,33 @@ const Portfolio = () => {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:border-purple-400/50 transition-all duration-300">
-              <div className="text-2xl font-bold text-purple-300">
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:border-blue-400/50 transition-all duration-300">
+              <div className="text-2xl font-bold text-blue-300">
                 {projects.length}+
               </div>
               <div className="text-sm text-slate-400">Projects</div>
             </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:border-purple-400/50 transition-all duration-300">
-              <div className="text-2xl font-bold text-purple-300">
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:border-blue-400/50 transition-all duration-300">
+              <div className="text-2xl font-bold text-blue-300">
                 3+
               </div>
               <div className="text-sm text-slate-400">Years Experience</div>
             </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:border-purple-400/50 transition-all duration-300">
-              <div className="text-2xl font-bold text-purple-300">
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:border-blue-400/50 transition-all duration-300">
+              <div className="text-2xl font-bold text-blue-300">
                 0
               </div>
               <div className="text-sm text-slate-400">Profile Views</div>
             </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:border-purple-400/50 transition-all duration-300">
-              <div className="text-2xl font-bold text-purple-300">
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:border-blue-400/50 transition-all duration-300">
+              <div className="text-2xl font-bold text-blue-300">
                 0
               </div>
               <div className="text-sm text-slate-400">Monthly Views</div>
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* About Section */}
       <section
@@ -490,12 +508,12 @@ const Portfolio = () => {
         className="min-h-screen flex items-center justify-center px-4 pt-16"
       >
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold mb-12 text-center bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold mb-12 text-center bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
             About Me
           </h2>
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="bg-gradient-to-br from-purple-600 to-pink-600 w-64 h-64 rounded-full mx-auto mb-8 flex items-center justify-center text-6xl shadow-2xl">
+              <div className="bg-gradient-to-br from-blue-600 to-pink-600 w-64 h-64 rounded-full mx-auto mb-8 flex items-center justify-center text-6xl shadow-2xl">
                 👨‍💻
               </div>
               <div className="text-center space-y-4">
@@ -528,7 +546,7 @@ const Portfolio = () => {
                 aspiring developers in my community.
               </p>
               <div className="flex flex-wrap gap-4">
-                <span className="bg-purple-600/20 text-purple-300 px-4 py-2 rounded-full text-sm border border-purple-600/30">
+                <span className="bg-blue-600/20 text-blue-300 px-4 py-2 rounded-full text-sm border border-blue-600/30">
                   🧩 Problem Solver
                 </span>
                 <span className="bg-pink-600/20 text-pink-300 px-4 py-2 rounded-full text-sm border border-pink-600/30">
@@ -549,18 +567,18 @@ const Portfolio = () => {
         className="min-h-screen flex items-center justify-center px-4 pt-16"
       >
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold mb-12 text-center bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold mb-12 text-center bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
             Experience
           </h2>
           <div className="space-y-8">
             {/* Frontend Engineer - Capriquota */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 hover:border-purple-400/30 transition-colors duration-300">
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 hover:border-blue-400/30 transition-colors duration-300">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
                 <div>
                   <h3 className="text-2xl font-semibold text-white mb-4">
                     Frontend Engineer
                   </h3>
-                  <p className="text-purple-300 text-lg">Capriquota • Remote</p>
+                  <p className="text-blue-300 text-lg">Capriquota • Remote</p>
                 </div>
                 <div className="text-slate-300 mt-4 md:mt-0">
                   January 2023 - August 2023
@@ -568,21 +586,21 @@ const Portfolio = () => {
               </div>
               <ul className="space-y-4 text-slate-300">
                 <li className="flex items-start space-x-4">
-                  <span className="text-purple-400 mt-1">•</span>
+                  <span className="text-blue-400 mt-1">•</span>
                   <span>
                     Deployed server-side rendering (SSR) using Next.js to
                     improve page load times by 10% and SEO performance
                   </span>
                 </li>
                 <li className="flex items-start space-x-4">
-                  <span className="text-purple-400 mt-1">•</span>
+                  <span className="text-blue-400 mt-1">•</span>
                   <span>
                     Partnered with senior developers in reducing development
                     time by 25%, making use of technologies like React.js
                   </span>
                 </li>
                 <li className="flex items-start space-x-4">
-                  <span className="text-purple-400 mt-1">•</span>
+                  <span className="text-blue-400 mt-1">•</span>
                   <span>
                     Coordinated with the product design team to design and
                     implement an intuitive user interface and achieved a 20%
@@ -593,13 +611,13 @@ const Portfolio = () => {
             </div>
 
             {/* Frontend Engineer Intern - Dev Career */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 hover:border-purple-400/30 transition-colors duration-300">
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 hover:border-blue-400/30 transition-colors duration-300">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
                 <div>
                   <h3 className="text-2xl font-semibold text-white mb-4">
                     Frontend Engineer Intern
                   </h3>
-                  <p className="text-purple-300 text-lg">Dev Career • Ibadan</p>
+                  <p className="text-blue-300 text-lg">Dev Career • Ibadan</p>
                 </div>
                 <div className="text-slate-300 mt-4 md:mt-0">
                   September 2022 - December 2022
@@ -607,7 +625,7 @@ const Portfolio = () => {
               </div>
               <ul className="space-y-4 text-slate-300">
                 <li className="flex items-start space-x-4">
-                  <span className="text-purple-400 mt-1">•</span>
+                  <span className="text-blue-400 mt-1">•</span>
                   <span>
                     Worked jointly with senior developers to assist in
                     developing responsive websites using HTML, CSS, and
@@ -615,14 +633,14 @@ const Portfolio = () => {
                   </span>
                 </li>
                 <li className="flex items-start space-x-4">
-                  <span className="text-purple-400 mt-1">•</span>
+                  <span className="text-blue-400 mt-1">•</span>
                   <span>
                     Assisted in developing and maintaining front-end components
                     of web applications using modern frameworks like React
                   </span>
                 </li>
                 <li className="flex items-start space-x-4">
-                  <span className="text-purple-400 mt-1">•</span>
+                  <span className="text-blue-400 mt-1">•</span>
                   <span>
                     Collaborated with senior developers to develop responsive
                     web applications that were optimized for different screen
@@ -633,20 +651,20 @@ const Portfolio = () => {
             </div>
 
             {/* Education Section */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 hover:border-purple-400/30 transition-colors duration-300">
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 hover:border-blue-400/30 transition-colors duration-300">
               <h3 className="text-2xl font-semibold text-white mb-8">
                 Education
               </h3>
 
               <div className="space-y-8">
                 {/* Master Degree */}
-                <div className="relative pl-8 border-l-2 border-purple-400/30">
-                  <div className="absolute -left-2 top-0 w-4 h-4 bg-purple-400 rounded-full"></div>
+                <div className="relative pl-8 border-l-2 border-blue-400/30">
+                  <div className="absolute -left-2 top-0 w-4 h-4 bg-blue-400 rounded-full"></div>
                   <div className="space-y-2">
                     <h4 className="text-xl font-semibold text-white">
                       Master Degree
                     </h4>
-                    <p className="text-purple-300 text-lg">
+                    <p className="text-blue-300 text-lg">
                       University of Ibadan, Nigeria
                     </p>
                     <p className="text-slate-400">2023 - 2025</p>
@@ -654,13 +672,13 @@ const Portfolio = () => {
                 </div>
 
                 {/* Bachelor Degree */}
-                <div className="relative pl-8 border-l-2 border-purple-400/30">
-                  <div className="absolute -left-2 top-0 w-4 h-4 bg-purple-400 rounded-full"></div>
+                <div className="relative pl-8 border-l-2 border-blue-400/30">
+                  <div className="absolute -left-2 top-0 w-4 h-4 bg-blue-400 rounded-full"></div>
                   <div className="space-y-2">
                     <h4 className="text-xl font-semibold text-white">
                       Bachelor Degree
                     </h4>
-                    <p className="text-purple-300 text-lg">
+                    <p className="text-blue-300 text-lg">
                       University of Ibadan, Nigeria
                     </p>
                     <p className="text-slate-400">2018 - 2022</p>
@@ -675,14 +693,14 @@ const Portfolio = () => {
       {/* Projects Section */}
       <section id="projects" className="min-h-screen py-20 px-4">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold mb-12 text-center bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold mb-12 text-center bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
             Featured Projects
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
             {projects.map((project, index) => (
               <div
                 key={project.id || index}
-                className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-purple-400/50 transition-all duration-300 hover:scale-105"
+                className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-blue-400/50 transition-all duration-300 hover:scale-105"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
@@ -694,7 +712,7 @@ const Portfolio = () => {
                         {project.title}
                       </h3>
                       <div className="flex items-center space-x-2 mt-1">
-                        <span className="text-sm text-purple-300 bg-purple-600/20 px-2 py-1 rounded-full">
+                        <span className="text-sm text-blue-300 bg-blue-600/20 px-2 py-1 rounded-full">
                           {project.category}
                         </span>
                         {project.year && (
@@ -714,14 +732,14 @@ const Portfolio = () => {
                   {project.description}
                 </p>
                 <div className="mb-4">
-                  <h4 className="text-sm font-semibold text-purple-300 mb-2">
+                  <h4 className="text-sm font-semibold text-blue-300 mb-2">
                     Key Features:
                   </h4>
                   <ul className="text-xs text-slate-400 space-y-1">
                     {(project.features || []).map(
                       (feature: string, idx: number) => (
                         <li key={idx} className="flex items-center">
-                          <ChevronRight className="w-3 h-3 mr-1 text-purple-400" />
+                          <ChevronRight className="w-3 h-3 mr-1 text-blue-400" />
                           {feature}
                         </li>
                       )
@@ -745,7 +763,7 @@ const Portfolio = () => {
                     href={project.github_url || project.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center text-sm text-purple-300 hover:text-purple-200 transition-colors"
+                    className="flex items-center text-sm text-blue-300 hover:text-purple-200 transition-colors"
                     onClick={() => window.open(project.demo_url, "_blank")}
                   >
                     <Github className="w-4 h-4 mr-1" />
@@ -755,7 +773,7 @@ const Portfolio = () => {
                     href={project.demo_url || project.demo}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center text-sm text-purple-300 hover:text-purple-200 transition-colors"
+                    className="flex items-center text-sm text-blue-300 hover:text-purple-200 transition-colors"
                     onClick={() => window.open(project.demo_url, "_blank")}
                   >
                     <ExternalLink className="w-4 h-4 mr-1" />
@@ -774,23 +792,23 @@ const Portfolio = () => {
         className="min-h-screen flex items-center justify-center px-4 pt-16"
       >
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold mb-12 text-center bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold mb-12 text-center bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
             Technical Skills
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {skills.map((skill, index) => (
               <div
                 key={index}
-                className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-purple-400/50 transition-all duration-300 hover:scale-105"
+                className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-blue-400/50 transition-all duration-300 hover:scale-105"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
-                    <div className="text-purple-400 mr-3">{skill.icon}</div>
+                    <div className="text-blue-400 mr-3">{skill.icon}</div>
                     <h3 className="text-xl font-semibold text-white">
                       {skill.name}
                     </h3>
                   </div>
-                  <div className="text-sm text-purple-300 font-semibold">
+                  <div className="text-sm text-blue-300 font-semibold">
                     {skill.proficiency || 85}%
                   </div>
                 </div>
@@ -821,7 +839,7 @@ const Portfolio = () => {
         className="min-h-screen flex items-center justify-center px-4 pt-16"
       >
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-8 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold mb-8 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
             Let us Connect
           </h2>
           <p className="text-xl text-slate-300 mb-12">
@@ -831,7 +849,7 @@ const Portfolio = () => {
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-8 mb-12">
             <a
               href="mailto:teedaku@gmail.com"
-              className="flex items-center justify-center space-x-2 bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg transition-colors"
+              className="flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg transition-colors"
             >
               <Mail className="w-5 h-5" />
               <span>Email Me</span>
@@ -886,7 +904,7 @@ const Portfolio = () => {
                   placeholder="Your Name"
                   value={contactForm.name}
                   onChange={handleContactChange}
-                  className="bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-purple-400 transition-colors"
+                  className="bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 transition-colors"
                 />
                 <input
                   type="email"
@@ -894,7 +912,7 @@ const Portfolio = () => {
                   placeholder="Your Email"
                   value={contactForm.email}
                   onChange={handleContactChange}
-                  className="bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-purple-400 transition-colors"
+                  className="bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 transition-colors"
                 />
               </div>
               <textarea
@@ -903,12 +921,12 @@ const Portfolio = () => {
                 rows={5}
                 value={contactForm.message}
                 onChange={handleContactChange}
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-purple-400 transition-colors"
+                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 transition-colors"
               />
               <button
                 onClick={handleContactSubmit}
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center space-x-2"
+                className="w-full bg-gradient-to-r from-blue-600 to-pink-600 hover:from-blue-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center space-x-2"
               >
                 {isSubmitting ? (
                   <>
@@ -939,7 +957,7 @@ const Portfolio = () => {
                 href="https://github.com/Afolstee"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-slate-400 hover:text-purple-300 transition-colors"
+                className="text-slate-400 hover:text-blue-300 transition-colors"
               >
                 <Github className="w-5 h-5" />
               </a>
@@ -947,13 +965,13 @@ const Portfolio = () => {
                 href="https://www.linkedin.com/in/temilade-afolabi-aa7b7430b/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-slate-400 hover:text-purple-300 transition-colors"
+                className="text-slate-400 hover:text-blue-300 transition-colors"
               >
                 <Linkedin className="w-5 h-5" />
               </a>
               <a
                 href="mailto:teedaku@gmail.com"
-                className="text-slate-400 hover:text-purple-300 transition-colors"
+                className="text-slate-400 hover:text-blue-300 transition-colors"
               >
                 <Mail className="w-5 h-5" />
               </a>
