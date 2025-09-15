@@ -4,10 +4,6 @@ const nextConfig = {
   trailingSlash: true,
   images: {
     unoptimized: true
-  },
-  // Configure for Replit environment - allow all hosts
-  experimental: {
-    allowedHosts: true
   }
 }
 

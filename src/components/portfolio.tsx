@@ -20,7 +20,6 @@ import {
   Star,
   ArrowUp,
 } from "lucide-react";
-import { portfolioApi } from "../lib/api";
 
 interface Project {
   id: number;
@@ -47,12 +46,6 @@ interface Skill {
   proficiency: number;
 }
 
-interface Analytics {
-  total_views: number;
-  monthly_views: number;
-  projects_count: number;
-  years_experience: number;
-}
 
 interface ContactForm {
   name: string;
@@ -65,20 +58,108 @@ interface ContactStatus {
   message: string;
 }
 
-interface ApiSkill {
-  name: string;
-  technologies: string[];
-  proficiency?: number;
-}
 
 const Portfolio = () => {
   const [activeSection, setActiveSection] = useState("home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  // Static data
+  const projects: Project[] = [
+    {
+      id: 1,
+      title: "Market Days",
+      description: "A location-based web application that helps users discover local markets and preview market days in their area. Built with modern web technologies and real-time data integration.",
+      tech_stack: ["HTML", "CSS", "Vanilla JS"],
+      features: ["Location-based search", "Market day previews", "Real-time data", "Mobile responsive"],
+      github_url: "https://github.com/Afolstee/market-days",
+      demo_url: "https://market-days.vercel.app/",
+      image_emoji: "🏪",
+      category: "Frontend"
+    },
+    {
+      id: 2,
+      title: "Trading Simulator",
+      description: "A comprehensive paper trading platform with user authentication, real-time market data, and portfolio management. Enables risk-free trading education and strategy testing.",
+      tech_stack: ["Next.js", "Python", "FastAPI", "WebSocket"],
+      features: ["User authentication", "Portfolio tracking", "Performance analytics", "Risk management"],
+      github_url: "https://github.com/Afolstee/trading-simulator",
+      demo_url: "https://trading-sim-brown.vercel.app",
+      image_emoji: "📈",
+      category: "Full Stack"
+    },
+    {
+      id: 3,
+      title: "Crypto Dashboard",
+      description: "A real-time cryptocurrency tracking dashboard featuring live price updates, market news, and portfolio management. Integrates with multiple APIs for comprehensive market data.",
+      tech_stack: ["Next.js", "Python", "CoinGecko API", "CryptoCompare API", "WebSocket", "Chart.js", "Redis"],
+      features: ["Live price tracking", "Market news", "Portfolio management", "Price alerts", "AI Technical analysis"],
+      github_url: "https://github.com/Afolstee/analyse-crypto",
+      demo_url: "https://analyse-crypto-nine.vercel.app/",
+      image_emoji: "₿",
+      category: "Full Stack"
+    },
+    {
+      id: 4,
+      title: "Book a Stay",
+      description: "A modern hotel booking platform with elegant design, advanced search functionality, and seamless user experience. Features comprehensive property management and booking system.",
+      tech_stack: ["HTML", "CSS", "JavaScript"],
+      features: ["Advanced search", "Availability Filter", "Review system"],
+      github_url: "https://github.com/Afolstee/book-stay",
+      demo_url: "http://book-stay-99sx.vercel.app",
+      image_emoji: "🏨",
+      category: "Frontend"
+    },
+    {
+      id: 5,
+      title: "Dakuzon",
+      description: "A modern e-commerce platform with elegant design, advanced search functionality, and seamless user experience. Features comprehensive property management and booking system.",
+      tech_stack: ["HTML", "CSS", "JavaScript"],
+      features: ["Advanced search", "Availability Filter", "Review system"],
+      github_url: "https://github.com/Afolstee/dakuzon",
+      demo_url: "https://dakuzon.vercel.app/",
+      image_emoji: "🛒",
+      category: "Frontend"
+    },
+    {
+      id: 6,
+      title: "Online-Shop",
+      description: "A modern online shoe shopping platform with elegant design, advanced search functionality, and seamless user experience. Features comprehensive property management and booking system.",
+      tech_stack: ["HTML", "CSS", "JavaScript"],
+      features: ["Advanced search", "Availability Filter", "Review system"],
+      github_url: "https://github.com/Afolstee/online-shop",
+      demo_url: "https://online-shop-flame.vercel.app/",
+      image_emoji: "👟",
+      category: "Frontend"
+    }
+  ];
+
+  const skills: Skill[] = [
+    {
+      name: "Frontend Development",
+      icon: <Globe className="w-6 h-6" />,
+      techs: ["React", "Next.js", "TypeScript", "JavaScript", "HTML5", "CSS3", "Tailwind CSS", "Bootstrap"],
+      proficiency: 95
+    },
+    {
+      name: "Backend Development",
+      icon: <Database className="w-6 h-6" />,
+      techs: ["Python", "FastAPI", "Node.js", "Express.js", "RESTful APIs", "GraphQL", "WebSocket"],
+      proficiency: 90
+    },
+    {
+      name: "Database & Storage",
+      icon: <Database className="w-6 h-6" />,
+      techs: ["PostgreSQL", "MongoDB", "Redis", "SQLAlchemy", "Prisma", "Firebase"],
+      proficiency: 88
+    },
+    {
+      name: "DevOps & Tools",
+      icon: <Code className="w-6 h-6" />,
+      techs: ["Git", "Vercel", "Railway", "Render"],
+      proficiency: 85
+    }
+  ];
   const [scrollTimeout, setScrollTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
@@ -162,119 +243,12 @@ const Portfolio = () => {
     return iconMap[skillName] || <Code className="w-6 h-6" />;
   };
 
-  // Fallback data in case API fails
-  const getDefaultProjects = (): Project[] => [
-    {
-      id: 1,
-      title: "Market Days",
-      description:
-        "A location-based web application that helps users discover local markets and preview market days in their area.",
-      tech_stack: ["Next.js", "React", "Node.js", "Express", "Tailwind CSS"],
-      features: [
-        "Location-based search",
-        "Market day previews",
-        "Real-time data",
-        "Mobile responsive",
-      ],
-      github_url: "#",
-      demo_url: "https://market-days.vercel.app/",
-      image_emoji: "🏪",
-      category: "Full Stack",
-    },
-    {
-      id: 2,
-      title: "Trading Simulator",
-      description:
-        "A comprehensive paper trading platform with user authentication, real-time market data, and portfolio management.",
-      tech_stack: ["React", "Python", "FastAPI", "PostgreSQL", "JWT Auth"],
-      features: [
-        "User authentication",
-        "Real-time trading",
-        "Portfolio tracking",
-        "Performance analytics",
-      ],
-      github_url: "#",
-      demo_url: "https://trading-sim-brown.vercel.app",
-      image_emoji: "📈",
-      category: "Full Stack",
-    },
-  ];
 
-  const getDefaultSkills = (): Skill[] => [
-    {
-      name: "Frontend",
-      icon: <Globe className="w-6 h-6" />,
-      techs: ["React", "Next.js", "TypeScript", "Tailwind CSS"],
-      proficiency: 95,
-    },
-    {
-      name: "Backend",
-      icon: <Database className="w-6 h-6" />,
-      techs: ["Python", "FastAPI", "Node.js", "PostgreSQL"],
-      proficiency: 90,
-    },
-    {
-      name: "Tools",
-      icon: <Code className="w-6 h-6" />,
-      techs: ["Git", "Docker", "AWS", "Vercel"],
-      proficiency: 88,
-    },
-  ];
-
-  // Fetch data from API
+  // Set loading to false immediately since we have static data
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch projects
-        const projectsData = await portfolioApi.getProjects();
-        setProjects(projectsData);
-
-        // Fetch skills
-        const skillsData: ApiSkill[] = await portfolioApi.getSkills();
-        setSkills(
-          skillsData.map(
-            (skill: ApiSkill): Skill => ({
-              name: skill.name,
-              icon: getSkillIcon(skill.name),
-              techs: skill.technologies,
-              proficiency: skill.proficiency || 85, // Default proficiency if not provided
-            })
-          )
-        );
-
-        // Fetch analytics
-        const analyticsData = await portfolioApi.getAnalytics();
-        setAnalytics(analyticsData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        // Fallback to default data if API fails
-        setProjects(getDefaultProjects());
-        setSkills(getDefaultSkills());
-        setAnalytics({
-          total_views: 0,
-          monthly_views: 0,
-          projects_count: 2,
-          years_experience: 3,
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
+    setIsLoading(false);
   }, []);
 
-  // Track project views
-  const trackProjectView = async (projectId: number, projectTitle: string) => {
-    try {
-      await portfolioApi.trackView(projectId, {
-        project_name: projectTitle,
-        user_ip: null,
-      });
-    } catch (error) {
-      console.error("Error tracking project view:", error);
-    }
-  };
 
   // Handle contact form submission
   const handleContactSubmit = async () => {
@@ -291,7 +265,8 @@ const Portfolio = () => {
     setContactStatus({ type: "", message: "" });
 
     try {
-      const result = await portfolioApi.submitContact(contactForm);
+      // Simulate successful contact form submission
+      const result = { message: "Message sent successfully! I'll get back to you soon." };
 
       setContactStatus({
         type: "success",
@@ -489,19 +464,19 @@ const Portfolio = () => {
             </div>
             <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:border-purple-400/50 transition-all duration-300">
               <div className="text-2xl font-bold text-purple-300">
-                {analytics?.years_experience || "3"}+
+                3+
               </div>
               <div className="text-sm text-slate-400">Years Experience</div>
             </div>
             <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:border-purple-400/50 transition-all duration-300">
               <div className="text-2xl font-bold text-purple-300">
-                {analytics?.total_views || "0"}
+                0
               </div>
               <div className="text-sm text-slate-400">Profile Views</div>
             </div>
             <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:border-purple-400/50 transition-all duration-300">
               <div className="text-2xl font-bold text-purple-300">
-                {analytics?.monthly_views || "0"}
+                0
               </div>
               <div className="text-sm text-slate-400">Monthly Views</div>
             </div>
@@ -771,7 +746,7 @@ const Portfolio = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center text-sm text-purple-300 hover:text-purple-200 transition-colors"
-                    onClick={() => trackProjectView(project.id, project.title)}
+                    onClick={() => window.open(project.demo_url, "_blank")}
                   >
                     <Github className="w-4 h-4 mr-1" />
                     Code
@@ -781,7 +756,7 @@ const Portfolio = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center text-sm text-purple-300 hover:text-purple-200 transition-colors"
-                    onClick={() => trackProjectView(project.id, project.title)}
+                    onClick={() => window.open(project.demo_url, "_blank")}
                   >
                     <ExternalLink className="w-4 h-4 mr-1" />
                     Live Demo
