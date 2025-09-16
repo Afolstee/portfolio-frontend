@@ -4,10 +4,13 @@ const nextConfig = {
   images: {
     unoptimized: true
   },
-  // Allow all dev origins for Replit environment
-  experimental: {
-    allowedDevOrigins: ['*']
-  },
+  // Allow dev origins for Replit environment
+  allowedDevOrigins: [
+    '*.replit.dev',
+    '*.repl.co', 
+    'localhost:5000',
+    '127.0.0.1:5000'
+  ],
   // Disable cache for development
   async headers() {
     return [

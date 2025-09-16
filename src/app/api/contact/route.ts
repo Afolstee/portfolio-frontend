@@ -71,23 +71,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check content length (max 10KB) - require Content-Length header
-    const contentLength = request.headers.get('content-length');
-    if (!contentLength) {
-      return NextResponse.json(
-        { error: 'Content-Length header required' },
-        { status: 400 }
-      );
-    }
+    const body = await request.json();
     
-    if (parseInt(contentLength) > 10240) {
+    // Check content length (max 10KB) by measuring the actual body size
+    const bodySize = Buffer.byteLength(JSON.stringify(body), 'utf8');
+    if (bodySize > 10240) {
       return NextResponse.json(
         { error: 'Message too large (max 10KB)' },
         { status: 413 }
       );
     }
-
-    const body = await request.json();
     const { name, email, message, honeypot } = body;
 
     // Honeypot check (bot protection)
@@ -142,11 +135,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Configure SMTP transporter
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_SERVER || 'smtp.gmail.com',
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: false, // true for 465, false for other ports
+    // Configure SMTP transporter for Gmail
+    const transporter = nodemailer.createTransporter({
+      service: 'gmail',
+      secure: true,
       auth: {
         user: process.env.SENDER_EMAIL,
         pass: process.env.SENDER_PASSWORD,
