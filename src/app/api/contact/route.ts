@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Configure SMTP transporter for Gmail
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       service: 'gmail',
       secure: true,
       auth: {
