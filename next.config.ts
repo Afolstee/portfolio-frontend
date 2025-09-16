@@ -5,7 +5,9 @@ const nextConfig = {
     unoptimized: true
   },
   // Allow all dev origins for Replit environment
-  allowedDevOrigins: ['*'],
+  experimental: {
+    allowedDevOrigins: ['*']
+  },
   // Disable cache for development
   async headers() {
     return [
