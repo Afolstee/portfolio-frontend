@@ -4,7 +4,9 @@ const nextConfig = {
   images: {
     unoptimized: true
   },
-  // Allow all hosts for Replit environment
+  // Allow all dev origins for Replit environment
+  allowedDevOrigins: ['*'],
+  // Disable cache for development
   async headers() {
     return [
       {
