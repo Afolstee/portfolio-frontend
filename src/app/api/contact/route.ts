@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendEmail } from '../../../utils/replitmail';
+import nodemailer from 'nodemailer';
 
 // Simple rate limiting store (in production, use Redis or database)
 const rateLimitMap = new Map<string, number[]>();
@@ -22,9 +22,22 @@ function htmlEscape(str: string): string {
 }
 
 function getRateLimitKey(request: NextRequest): string {
-  // For Replit environment, use a simple fallback approach
-  // In production, consider using a more robust IP detection
-  return 'rate-limit-key'; // Single rate limit for all users
+  // Get IP from headers for proper per-IP rate limiting
+  const forwarded = request.headers.get('x-forwarded-for');
+  const realIp = request.headers.get('x-real-ip');
+  
+  // Use the first IP from x-forwarded-for if available
+  if (forwarded) {
+    return `ip:${forwarded.split(',')[0].trim()}`;
+  }
+  
+  // Use x-real-ip if available
+  if (realIp) {
+    return `ip:${realIp}`;
+  }
+  
+  // Fallback for development
+  return 'ip:localhost';
 }
 
 function isRateLimited(key: string, isEmail: boolean = false): boolean {
@@ -49,11 +62,11 @@ function isRateLimited(key: string, isEmail: boolean = false): boolean {
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting
+    // Rate limiting - check both IP and email
     const rateLimitKey = getRateLimitKey(request);
     if (isRateLimited(rateLimitKey)) {
       return NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
+        { error: 'Too many requests from this IP. Please try again later.' },
         { status: 429 }
       );
     }
@@ -110,27 +123,57 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get recipient from environment variable (required)
+    // Per-email rate limiting
+    const emailKey = `email:${email.toLowerCase()}`;
+    if (isRateLimited(emailKey, true)) {
+      return NextResponse.json(
+        { error: 'Too many messages from this email. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
+    // Get recipient from environment variable (required in production)
     const recipient = process.env.CONTACT_EMAIL;
     if (!recipient) {
       console.error('CONTACT_EMAIL environment variable not set');
       return NextResponse.json(
-        { error: 'Service configuration error' },
+        { error: 'Email service not configured properly' },
         { status: 503 }
       );
     }
 
-    // Send email using Replit Mail
-    await sendEmail({
+    // Configure SMTP transporter
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_SERVER || 'smtp.gmail.com',
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: process.env.SENDER_EMAIL,
+        pass: process.env.SENDER_PASSWORD,
+      },
+    });
+
+    // Verify SMTP configuration
+    if (!process.env.SENDER_EMAIL || !process.env.SENDER_PASSWORD) {
+      console.error('SMTP credentials not configured');
+      return NextResponse.json(
+        { error: 'Email service not configured' },
+        { status: 503 }
+      );
+    }
+
+    // Send email using nodemailer
+    await transporter.sendMail({
+      from: `"Portfolio Contact" <${process.env.SENDER_EMAIL}>`,
       to: recipient,
       subject: `Portfolio Contact: ${name}`,
       text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
       html: `
         <h3>New Portfolio Contact Form Submission</h3>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Name:</strong> ${htmlEscape(name)}</p>
+        <p><strong>Email:</strong> ${htmlEscape(email)}</p>
         <p><strong>Message:</strong></p>
-        <p>${message.replace(/\n/g, '<br>').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+        <p>${htmlEscape(message).replace(/\n/g, '<br>')}</p>
       `
     });
 
