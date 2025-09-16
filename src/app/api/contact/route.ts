@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { sendEmail as sendEmailReplit } from '../../../utils/replitmail';
 import nodemailer from 'nodemailer';
 
 // Simple rate limiting store (in production, use Redis or database)
@@ -135,43 +136,57 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Configure SMTP transporter for Gmail
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false, // true for 465, false for other ports like 587
-      auth: {
-        user: process.env.SENDER_EMAIL,
-        pass: process.env.SENDER_PASSWORD,
-      },
-      tls: {
-        rejectUnauthorized: false
+    // Environment-aware email sending
+    const isReplit = process.env.REPL_IDENTITY || process.env.WEB_REPL_RENEWAL;
+    
+    if (isReplit) {
+      // Use Replit Mail in Replit environment - from blueprint:replitmail
+      await sendEmailReplit({
+        to: recipient,
+        subject: `Portfolio Contact: ${name}`,
+        text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+        html: `
+          <h3>New Portfolio Contact Form Submission</h3>
+          <p><strong>Name:</strong> ${htmlEscape(name)}</p>
+          <p><strong>Email:</strong> ${htmlEscape(email)}</p>
+          <p><strong>Message:</strong></p>
+          <p>${htmlEscape(message).replace(/\n/g, '<br>')}</p>
+        `
+      });
+    } else {
+      // Use SMTP for Vercel/production (requires SENDER_EMAIL and SENDER_PASSWORD)
+      if (!process.env.SENDER_EMAIL || !process.env.SENDER_PASSWORD) {
+        console.error('Production email not configured - need SENDER_EMAIL and SENDER_PASSWORD');
+        return NextResponse.json(
+          { error: 'Email service not configured for production' },
+          { status: 503 }
+        );
       }
-    });
-
-    // Verify SMTP configuration
-    if (!process.env.SENDER_EMAIL || !process.env.SENDER_PASSWORD) {
-      console.error('SMTP credentials not configured');
-      return NextResponse.json(
-        { error: 'Email service not configured' },
-        { status: 503 }
-      );
+      
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.SENDER_EMAIL,
+          pass: process.env.SENDER_PASSWORD,
+        },
+      });
+      
+      await transporter.sendMail({
+        from: `"Portfolio Contact" <${process.env.SENDER_EMAIL}>`,
+        to: recipient,
+        subject: `Portfolio Contact: ${name}`,
+        text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+        html: `
+          <h3>New Portfolio Contact Form Submission</h3>
+          <p><strong>Name:</strong> ${htmlEscape(name)}</p>
+          <p><strong>Email:</strong> ${htmlEscape(email)}</p>
+          <p><strong>Message:</strong></p>
+          <p>${htmlEscape(message).replace(/\n/g, '<br>')}</p>
+        `
+      });
     }
-
-    // Send email using nodemailer
-    await transporter.sendMail({
-      from: `"Portfolio Contact" <${process.env.SENDER_EMAIL}>`,
-      to: recipient,
-      subject: `Portfolio Contact: ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
-      html: `
-        <h3>New Portfolio Contact Form Submission</h3>
-        <p><strong>Name:</strong> ${htmlEscape(name)}</p>
-        <p><strong>Email:</strong> ${htmlEscape(email)}</p>
-        <p><strong>Message:</strong></p>
-        <p>${htmlEscape(message).replace(/\n/g, '<br>')}</p>
-      `
-    });
 
     return NextResponse.json({
       message: "Message sent successfully! I'll get back to you soon."

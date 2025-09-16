@@ -11,19 +11,22 @@ const nextConfig = {
     'localhost:5000',
     '127.0.0.1:5000'
   ],
-  // Disable cache for development
+  // Disable cache for development only
   async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate',
-          },
-        ],
-      },
-    ]
+    if (process.env.NODE_ENV === 'development') {
+      return [
+        {
+          source: '/(.*)',
+          headers: [
+            {
+              key: 'Cache-Control',
+              value: 'no-cache, no-store, must-revalidate',
+            },
+          ],
+        },
+      ]
+    }
+    return [];
   },
 }
 
