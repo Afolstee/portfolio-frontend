@@ -9,7 +9,6 @@ import {
   Code,
   Database,
   Globe,
-  Smartphone,
   ChevronRight,
   Menu,
   X,
@@ -20,7 +19,7 @@ import {
   Star,
   ArrowUp,
 } from "lucide-react";
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import { sendEmail } from "../utils/replitmail";
 
 interface Project {
@@ -48,7 +47,6 @@ interface Skill {
   proficiency: number;
 }
 
-
 interface ContactForm {
   name: string;
   email: string;
@@ -60,12 +58,12 @@ interface ContactStatus {
   message: string;
 }
 
-
 const Portfolio = () => {
   const [activeSection, setActiveSection] = useState("home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
   // Static data
   const projects: Project[] = [
     {
@@ -162,9 +160,8 @@ const Portfolio = () => {
       proficiency: 85
     }
   ];
-  const [scrollTimeout, setScrollTimeout] = useState<NodeJS.Timeout | null>(
-    null
-  );
+
+  const [scrollTimeout, setScrollTimeout] = useState<NodeJS.Timeout | null>(null);
   const [contactForm, setContactForm] = useState<ContactForm>({
     name: "",
     email: "",
@@ -230,27 +227,10 @@ const Portfolio = () => {
     };
   }, [scrollTimeout]);
 
-  // Helper function to get skill icons
-  const getSkillIcon = (skillName: string): React.ReactElement => {
-    const iconMap: { [key: string]: React.ReactElement } = {
-      "Frontend Development": <Globe className="w-6 h-6" />,
-      "Backend Development": <Database className="w-6 h-6" />,
-      "Database & Storage": <Database className="w-6 h-6" />,
-      "DevOps & Tools": <Code className="w-6 h-6" />,
-      Mobile: <Smartphone className="w-6 h-6" />,
-      Frontend: <Globe className="w-6 h-6" />,
-      Backend: <Database className="w-6 h-6" />,
-      Tools: <Code className="w-6 h-6" />,
-    };
-    return iconMap[skillName] || <Code className="w-6 h-6" />;
-  };
-
-
   // Set loading to false immediately since we have static data
   useEffect(() => {
     setIsLoading(false);
   }, []);
-
 
   // Handle contact form submission
   const handleContactSubmit = async () => {
