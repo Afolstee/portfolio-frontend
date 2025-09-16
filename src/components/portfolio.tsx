@@ -20,7 +20,7 @@ import {
   ArrowUp,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { sendEmail } from "../utils/replitmail";
+// import { sendEmail } from "../utils/replitmail"; // Moved to API route
 
 interface Project {
   id: number;
@@ -51,6 +51,7 @@ interface ContactForm {
   name: string;
   email: string;
   message: string;
+  honeypot?: string;
 }
 
 interface ContactStatus {
@@ -166,6 +167,7 @@ const Portfolio = () => {
     name: "",
     email: "",
     message: "",
+    honeypot: "",
   });
   const [contactStatus, setContactStatus] = useState<ContactStatus>({
     type: "",
@@ -247,29 +249,29 @@ const Portfolio = () => {
     setContactStatus({ type: "", message: "" });
 
     try {
-      // Send actual email using Replit Mail integration
-      await sendEmail({
-        to: "afolstee@gmail.com",
-        subject: `Portfolio Contact: ${contactForm.name}`,
-        text: `Name: ${contactForm.name}\nEmail: ${contactForm.email}\n\nMessage:\n${contactForm.message}`,
-        html: `
-          <h3>New Portfolio Contact Form Submission</h3>
-          <p><strong>Name:</strong> ${contactForm.name}</p>
-          <p><strong>Email:</strong> ${contactForm.email}</p>
-          <p><strong>Message:</strong></p>
-          <p>${contactForm.message.replace(/\n/g, '<br>')}</p>
-        `
+      // Send email via API route
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contactForm),
       });
-      
-      const result = { message: "Message sent successfully! I'll get back to you soon." };
 
-      setContactStatus({
-        type: "success",
-        message:
-          result.message ||
-          "Message sent successfully! I'll get back to you soon.",
-      });
-      setContactForm({ name: "", email: "", message: "" });
+      const result = await response.json();
+
+      if (response.ok) {
+        setContactStatus({
+          type: "success",
+          message: result.message || "Message sent successfully! I'll get back to you soon.",
+        });
+        setContactForm({ name: "", email: "", message: "", honeypot: "" });
+      } else {
+        setContactStatus({
+          type: "error",
+          message: result.error || "Failed to send message. Please try again.",
+        });
+      }
     } catch (error) {
       console.error("Contact submission error:", error);
       setContactStatus({
@@ -902,6 +904,16 @@ const Portfolio = () => {
                 value={contactForm.message}
                 onChange={handleContactChange}
                 className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 transition-colors"
+              />
+              {/* Honeypot field (hidden from users) */}
+              <input
+                type="text"
+                name="honeypot"
+                value={contactForm.honeypot}
+                onChange={handleContactChange}
+                className="absolute -left-9999px opacity-0"
+                tabIndex={-1}
+                autoComplete="off"
               />
               <button
                 onClick={handleContactSubmit}
