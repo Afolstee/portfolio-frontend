@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { MessageCircle, X, Send, User, Bot } from "lucide-react";
+import { MessageCircle, X, Send, Bot } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Message = {
