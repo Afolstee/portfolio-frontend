@@ -64,14 +64,22 @@ interface ContactStatus {
 const BackgroundBlobs = () => {
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-[-1] bg-[#030305]">
-      {/* Optimized static blobs to prevent GPU overhead during scroll */}
+      {/* Radial gradients are much more performant than large blur filters */}
       <div
-        className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[80px]"
-        style={{ willChange: "transform" }}
+        className="absolute top-[10%] left-[-10%] w-[50%] h-[50%] rounded-full opacity-30"
+        style={{
+          background: "radial-gradient(circle, rgba(37, 99, 235, 0.4) 0%, transparent 70%)",
+          filter: "blur(60px)",
+          willChange: "transform",
+        }}
       />
       <div
-        className="absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] bg-pink-600/20 rounded-full blur-[100px]"
-        style={{ willChange: "transform" }}
+        className="absolute bottom-[10%] right-[-10%] w-[60%] h-[60%] rounded-full opacity-20"
+        style={{
+          background: "radial-gradient(circle, rgba(219, 39, 119, 0.4) 0%, transparent 70%)",
+          filter: "blur(80px)",
+          willChange: "transform",
+        }}
       />
     </div>
   );
@@ -238,12 +246,12 @@ const Portfolio = () => {
     },
     {
       id: 3,
-      title: "Crypto Dashboard",
-      description: "A real-time cryptocurrency tracking dashboard featuring live price updates, market news, and portfolio management. Integrates with multiple APIs for comprehensive market data.",
+      title: "Crypto Price Tracker",
+      description: "A real-time cryptocurrency tracking dashboard featuring live price updates. Integrates with multiple APIs for comprehensive market data.",
       tech_stack: ["Next.js", "Python", "CoinGecko API", "CryptoCompare API", "WebSocket", "Chart.js", "Redis"],
-      features: ["Live price tracking", "Market news", "Portfolio management", "Price alerts", "AI Technical analysis"],
-      github_url: "https://github.com/Afolstee/analyse-crypto",
-      demo_url: "https://analyse-crypto-nine.vercel.app/",
+      features: ["Live price tracking", "Price alerts"],
+      github_url: "https://github.com/Afolstee/CryptoSummary",
+      demo_url: "https://crypto-summary.vercel.app/",
       image_emoji: "₿",
       category: "Full Stack"
     },
@@ -271,13 +279,13 @@ const Portfolio = () => {
     },
     {
       id: 6,
-      title: "Online-Shop",
-      description: "A modern online shoe shopping platform with elegant design, advanced search functionality, and seamless user experience. Features comprehensive property management and booking system.",
-      tech_stack: ["HTML", "CSS", "JavaScript"],
-      features: ["Advanced search", "Availability Filter", "Review system"],
-      github_url: "https://github.com/Afolstee/online-shop",
-      demo_url: "https://online-shop-flame.vercel.app/",
-      image_emoji: "👟",
+      title: "Crypto Social Media Collector",
+      description: "A webapp that tracks new social media platforms for crypto prjects. It collects Discord, Telegram and X social media pages",
+      tech_stack: ["React", "Typescript", "Tailwind CSS"],
+      features: ["Social Media Platform Filter", "Review system"],
+      github_url: "https://github.com/Afolstee/DiscordCollector",
+      demo_url: "https://discord-collector.vercel.app/",
+      image_emoji: "₿",
       category: "Frontend"
     }
   ];
@@ -298,7 +306,7 @@ const Portfolio = () => {
     {
       name: "Database & Storage",
       icon: <Database className="w-5 h-5" />,
-      techs: ["PostgreSQL", "MongoDB", "Redis", "SQLAlchemy", "Prisma", "Firebase"],
+      techs: ["PostgreSQL", "MySQL", "MSSQL", "MongoDB", "Redis", "SQLAlchemy", "Prisma", "Firebase"],
       proficiency: 88
     },
     {
@@ -323,50 +331,39 @@ const Portfolio = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    let ticking = false;
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20% 0px -70% 0px',
+      threshold: 0
+    };
+
+    const handleIntersect = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(handleIntersect, observerOptions);
+    const sections = ["home", "about", "experience", "projects", "skills", "contact"];
+    
+    sections.forEach((sectionId) => {
+      const element = document.getElementById(sectionId);
+      if (element) observer.observe(element);
+    });
 
     const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const shouldShow = window.scrollY > 300;
-          setShowScrollTop(shouldShow);
-
-          if (scrollTimeout) {
-            clearTimeout(scrollTimeout);
-          }
-
-          if (shouldShow) {
-            const newTimeout = setTimeout(() => {
-              setShowScrollTop(false);
-            }, 2000);
-            setScrollTimeout(newTimeout);
-          }
-
-          const sections = ["home", "about", "experience", "projects", "skills", "contact"];
-          const currentSection = sections.find((section) => {
-            const element = document.getElementById(section);
-            if (element) {
-              const rect = element.getBoundingClientRect();
-              return rect.top <= 150 && rect.bottom >= 150;
-            }
-            return false;
-          });
-
-          if (currentSection) {
-            setActiveSection(currentSection);
-          }
-          ticking = false;
-        });
-        ticking = true;
-      }
+      const shouldShow = window.scrollY > 300;
+      setShowScrollTop(shouldShow);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
+      observer.disconnect();
       window.removeEventListener("scroll", handleScroll);
-      if (scrollTimeout) clearTimeout(scrollTimeout);
     };
-  }, [scrollTimeout]);
+  }, []);
 
   useEffect(() => {
     setTimeout(() => setIsLoading(false), 500); // Simulate brief load for smooth entry
@@ -599,12 +596,30 @@ const Portfolio = () => {
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="md:col-span-2 relative group"
+              className="md:col-span-2 flex justify-center items-center"
             >
-              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-3xl blur-2xl opacity-40 group-hover:opacity-60 transition-opacity duration-500" />
-              <div className="relative glass-card rounded-3xl overflow-hidden aspect-square flex items-center justify-center border border-white/20">
-                <div className="text-9xl transform group-hover:scale-110 transition-transform duration-500">
-                  👨‍💻
+              <div className="relative group p-4">
+                {/* Glowing aura shadow */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-blue-500 rounded-full blur-3xl opacity-20 group-hover:opacity-50 transition-all duration-500 scale-90 group-hover:scale-100" />
+                
+                {/* Profile Picture Frame */}
+                <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-full overflow-hidden border-2 border-white/20 group-hover:border-white/40 ring-4 ring-black/50 transition-all duration-500 shadow-2xl z-10 bg-white">
+                  <img 
+                    src="/media/headshot.jpeg" 
+                    alt="Afolabi Temilade" 
+                    className="w-full h-full object-contain object-center transform group-hover:scale-105 transition-all duration-700 ease-out z-0"
+                  />
+                  
+                  {/* Internal shadow to give a sphere/3D inset feel */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity duration-500 z-10 pointer-events-none" />
+                </div>
+                
+                {/* Floating DP Status Badge overlapping the edge */}
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-out z-20 whitespace-nowrap pointer-events-none">
+                  <div className="px-5 py-2.5 bg-[#030305]/90 backdrop-blur-xl border border-white/20 rounded-full flex items-center gap-2 shadow-2xl transform hover:scale-105 transition-transform cursor-default pointer-events-auto">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                    <span className="text-xs font-bold text-slate-200 tracking-wider uppercase">Open to work</span>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -651,35 +666,60 @@ const Portfolio = () => {
           <div className="relative border-l border-white/10 ml-4 md:ml-0 md:pl-0 space-y-12">
             {[
               {
-                role: "Frontend Engineer",
-                company: "Capriquota • Remote",
-                date: "Jan 2023 - Aug 2023",
+                role: "Backend Developer",
+                company: "Precious Cornerstone University • Ibadan, Nigeria",
+                date: "12/2025 – Current",
                 points: [
-                  "Deployed server-side rendering (SSR) using Next.js to improve page load times by 10% and SEO performance.",
-                  "Partnered with senior developers in reducing development time by 25%.",
-                  "Achieved a 20% increase in user engagement through intuitive UI implementations."
+                  "Created the backend server for admission portal.",
+                  "Enhanced system settings for the ICT dashboard e.g. created system lock for admission portal, result upload and course registration.",
+                  "Restructured their MSSQL database.",
+                  "Obtained and evaluated information on hardware configuration costs, reporting requirements and security needs.",
+                  "Improved and corrected existing software and system applications."
                 ]
               },
               {
-                role: "Frontend Engineer Intern",
-                company: "Dev Career • Ibadan",
-                date: "Sep 2022 - Dec 2022",
+                role: "Backend Developer",
+                company: "Vitesse • Lagos, Nigeria",
+                date: "08/2025 – 01/2026",
                 points: [
-                  "Assisted in developing and maintaining front-end components using React.",
-                  "Collaborated to develop responsive web applications optimized for multi-screen sizes."
+                  "Developed RESTful APIs for seamless data integration.",
+                  "Collaborated with frontend teams to enhance user experience.",
+                  "Implemented database solutions using MySQL.",
+                  "Wrote efficient and maintainable code for backend systems.",
+                  "Created SQL scripts to maintain database integrity and performance.",
+                  "Developed custom middleware for handling cross-cutting concerns such as logging, error handling, and request validation."
                 ]
               },
               {
-                role: "Master Degree",
-                company: "University of Ibadan, Nigeria",
-                date: "2023 - 2025",
-                points: ["Focusing on advanced computing concepts and modern software architecture."]
+                role: "Full Stack Web Developer",
+                company: "Private • Lagos, Nigeria",
+                date: "06/2024 – 10/2025",
+                points: [
+                  "Used React and Next.js to create a Point of Sale (POS) system for a restaurant and bar business.",
+                  "Applied security best practices in application development to safeguard against common vulnerabilities for both admin and waitstaff dashboard.",
+                  "Developed and maintained server-side applications using Node.js, enhancing application functionality and performance.",
+                  "Integrated payment tracking using Monnify."
+                ]
+              },
+              {
+                role: "Full Stack Web Developer",
+                company: "DakuGin Inc. • Lagos, Nigeria",
+                date: "04/2024 – 02/2025",
+                points: [
+                  "Developed a responsive web platform using JavaScript, HTML, and CSS for a market-days application.",
+                  "Utilized version control systems to manage code changes effectively.",
+                  "Contributed ideas towards improving usability of web application interfaces."
+                ]
               },
               {
                 role: "Bachelor Degree",
-                company: "University of Ibadan, Nigeria",
-                date: "2018 - 2022",
-                points: ["Graduated with honors, establishing strong fundamentals in computer science."]
+                company: "University of Ibadan • Nigeria",
+                date: "2018 - 2023",
+              },
+              {
+                role: "Master Degree",
+                company: "University of Ibadan • Nigeria",
+                date: "2024 - Present",
               }
             ].map((exp, idx) => (
               <motion.div
@@ -705,14 +745,16 @@ const Portfolio = () => {
                       {exp.date}
                     </span>
                   </div>
-                  <ul className="space-y-3 mt-4">
-                    {exp.points.map((point, k) => (
-                      <li key={k} className="text-slate-300 text-sm flex items-start gap-3">
-                        <ChevronRight className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
-                        <span className="leading-relaxed">{point}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  {exp.points && exp.points.length > 0 && (
+                    <ul className="space-y-3 mt-4">
+                      {exp.points.map((point, k) => (
+                        <li key={k} className="text-slate-300 text-sm flex items-start gap-3">
+                          <ChevronRight className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+                          <span className="leading-relaxed">{point}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </motion.div>
             ))}
