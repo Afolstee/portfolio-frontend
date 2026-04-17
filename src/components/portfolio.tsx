@@ -795,31 +795,44 @@ const Portfolio = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {project.github_url && (
-                        <a href={project.github_url} target="_blank" rel="noreferrer" className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-full transition-all">
-                          <Github className="w-5 h-5" />
-                        </a>
-                      )}
-                      {project.demo_url && (
-                        <a href={project.demo_url} target="_blank" rel="noreferrer" className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-full transition-all">
-                          <ExternalLink className="w-5 h-5" />
-                        </a>
-                      )}
-                    </div>
                   </div>
                   
                   <p className="text-slate-300 text-sm leading-relaxed mb-6 flex-grow">
                     {project.description}
                   </p>
                   
-                  <div className="space-y-4 mt-auto">
+                  <div className="space-y-6 mt-auto">
                     <div className="flex flex-wrap gap-2">
                       {(project.tech_stack || project.tech || []).map((tech, i) => (
                         <span key={i} className="text-xs font-medium text-slate-300 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
                           {tech}
                         </span>
                       ))}
+                    </div>
+
+                    <div className="flex items-center gap-4 pt-4 border-t border-white/5">
+                      {project.demo_url && (
+                        <a 
+                          href={project.demo_url} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="flex-1 flex items-center justify-center gap-2 py-3 bg-white text-black rounded-2xl font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-all"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          Live Demo
+                        </a>
+                      )}
+                      {project.github_url && (
+                        <a 
+                          href={project.github_url} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/10 text-white rounded-2xl font-bold text-sm hover:bg-white/10 active:scale-[0.98] transition-all"
+                        >
+                          <Github className="w-4 h-4" />
+                          Code
+                        </a>
+                      )}
                     </div>
                   </div>
                 </div>
