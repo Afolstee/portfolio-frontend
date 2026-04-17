@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   Github,
   ExternalLink,
@@ -16,7 +17,6 @@ import {
   CheckCircle,
   Loader2,
   Download,
-  Star,
   ArrowUp,
   Terminal,
   Cpu,
@@ -86,7 +86,7 @@ const BackgroundBlobs = () => {
 };
 
 // Falling Typewriter Component
-const FallingTypewriterText = ({ text, delay = 0 }: { text: string, delay?: number }) => {
+const FallingTypewriterText = ({ text }: { text: string }) => {
   const [typedCount, setTypedCount] = useState(0);
   const [fallingIndices, setFallingIndices] = useState<Set<number>>(new Set());
   const [phase, setPhase] = useState<'typing' | 'waiting' | 'falling' | 'resetting'>('typing');
@@ -317,7 +317,6 @@ const Portfolio = () => {
     }
   ];
 
-  const [scrollTimeout, setScrollTimeout] = useState<NodeJS.Timeout | null>(null);
   const [contactForm, setContactForm] = useState<ContactForm>({
     name: "",
     email: "",
@@ -389,7 +388,7 @@ const Portfolio = () => {
       } else {
         setContactStatus({ type: "error", message: result.error || "Failed to send message." });
       }
-    } catch (error) {
+    } catch {
       setContactStatus({ type: "error", message: "Failed to send message. Please try again." });
     } finally {
       setIsSubmitting(false);
@@ -402,7 +401,6 @@ const Portfolio = () => {
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-    if (scrollTimeout) clearTimeout(scrollTimeout);
     setShowScrollTop(false);
   };
 
@@ -546,8 +544,8 @@ const Portfolio = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-5xl md:text-7xl lg:text-8xl font-extrabold mb-6 tracking-tight leading-tight flex flex-col items-center"
           >
-            <span className="block mb-2 text-white">Hi, I'm</span>
-            <FallingTypewriterText text="Afolabi Temilade" delay={800} />
+            <span className="block mb-2 text-white">Hi, I&apos;m</span>
+            <FallingTypewriterText text="Afolabi Temilade" />
           </motion.h1>
           
           <motion.p
@@ -604,9 +602,11 @@ const Portfolio = () => {
                 
                 {/* Profile Picture Frame */}
                 <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-full overflow-hidden border-2 border-white/20 group-hover:border-white/40 ring-4 ring-black/50 transition-all duration-500 shadow-2xl z-10 bg-white">
-                  <img 
+                  <Image 
                     src="/media/headshot.jpeg" 
                     alt="Afolabi Temilade" 
+                    width={300}
+                    height={300}
                     className="w-full h-full object-contain object-center transform group-hover:scale-105 transition-all duration-700 ease-out z-0"
                   />
                   

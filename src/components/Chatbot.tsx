@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { MessageCircle, X, Send, User, Bot, Loader2 } from "lucide-react";
+import { MessageCircle, X, Send, User, Bot } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Message = {
@@ -15,12 +15,16 @@ type Message = {
 const TypewriterText = ({ text, onComplete }: { text: string, onComplete?: () => void }) => {
   const [displayedText, setDisplayedText] = useState("");
   const onCompleteRef = useRef(onComplete);
+  const hasRunRef = useRef(false);
   
   useEffect(() => {
     onCompleteRef.current = onComplete;
   }, [onComplete]);
   
   useEffect(() => {
+    if (hasRunRef.current) return;
+    hasRunRef.current = true;
+    
     let index = 0;
     setDisplayedText("");
     
@@ -261,7 +265,7 @@ export default function Chatbot() {
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 border-2 border-[#0f111a] rounded-full"></span>
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white">Temilade's Assistant</h3>
+                  <h3 className="text-sm font-bold text-white">Temilade&apos;s Assistant</h3>
                   <p className="text-xs text-slate-400">Online</p>
                 </div>
               </div>
@@ -317,12 +321,12 @@ export default function Chatbot() {
 
             {/* Quick Actions (only show initially or when prompted for external) */}
             {messages.length > 0 && introComplete && !awaitingEmail && (
-              <div className="px-4 pb-2 flex flex-wrap gap-2">
+              <div className="px-4 pb-2 flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {predefinedQuestions.map((q, i) => (
                   <button
                     key={i}
                     onClick={() => handleSend(q)}
-                    className="text-xs bg-white/5 border border-white/10 hover:bg-white/15 text-slate-300 px-3 py-1.5 rounded-full transition-colors text-left"
+                    className="text-xs shrink-0 whitespace-nowrap bg-white/5 border border-white/10 hover:bg-white/15 text-slate-300 px-3 py-1.5 rounded-full transition-colors text-left"
                   >
                     {q}
                   </button>
