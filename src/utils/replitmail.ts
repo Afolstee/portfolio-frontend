@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Zod schema matching the backend implementation
-export const zSmtpMessage = z.object({
+const zSmtpMessage = z.object({
   to: z
     .union([z.string().email(), z.array(z.string().email())])
     .describe("Recipient email address(es)"),
@@ -27,7 +27,7 @@ export const zSmtpMessage = z.object({
     .describe("Email attachments"),
 });
 
-export type SmtpMessage = z.infer<typeof zSmtpMessage>
+type SmtpMessage = z.infer<typeof zSmtpMessage>
 
 function getAuthToken(): string {
   const xReplitToken = process.env.REPL_IDENTITY

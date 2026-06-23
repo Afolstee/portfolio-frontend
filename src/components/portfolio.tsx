@@ -138,7 +138,7 @@ const FallingTypewriterText = ({ text }: { text: string }) => {
         {text.split('').map((char, index) => {
           const isTyped = index < typedCount;
           const isFalling = fallingIndices.has(index);
-          
+
           return (
             <div key={`char-${index}`} className="relative inline-block">
               <motion.span
@@ -147,8 +147,8 @@ const FallingTypewriterText = ({ text }: { text: string }) => {
                   isFalling
                     ? { y: 200, opacity: 0, rotate: index % 2 === 0 ? 45 : -45 }
                     : isTyped
-                    ? { y: 0, opacity: 1, rotate: 0 }
-                    : { y: 0, opacity: 0, rotate: 0 }
+                      ? { y: 0, opacity: 1, rotate: 0 }
+                      : { y: 0, opacity: 0, rotate: 0 }
                 }
                 transition={isFalling ? { duration: 0.6, ease: "easeIn" } : { duration: 0.05 }}
                 className="inline-block bg-gradient-to-br from-emerald-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent"
@@ -346,7 +346,7 @@ const Portfolio = () => {
 
     const observer = new IntersectionObserver(handleIntersect, observerOptions);
     const sections = ["home", "about", "experience", "projects", "skills", "contact"];
-    
+
     sections.forEach((sectionId) => {
       const element = document.getElementById(sectionId);
       if (element) observer.observe(element);
@@ -414,7 +414,7 @@ const Portfolio = () => {
 
   const downloadCV = () => {
     const link = document.createElement("a");
-    link.href = "/media/TemiladeAfolabiAResume.pdf";
+    link.href = "/media/TemiladeAfolabiCV.pdf";
     link.download = "TemiladeAfolabi_CV.pdf";
     link.click();
   };
@@ -446,7 +446,7 @@ const Portfolio = () => {
       <BackgroundBlobs />
 
       {/* Floating Navigation Dock */}
-      <motion.nav 
+      <motion.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -464,9 +464,8 @@ const Portfolio = () => {
               <button
                 key={item}
                 onClick={() => scrollToSection(item)}
-                className={`relative px-4 py-2 text-sm font-medium capitalize transition-colors duration-300 ${
-                  activeSection === item ? "text-white" : "text-slate-400 hover:text-slate-200"
-                }`}
+                className={`relative px-4 py-2 text-sm font-medium capitalize transition-colors duration-300 ${activeSection === item ? "text-white" : "text-slate-400 hover:text-slate-200"
+                  }`}
               >
                 {activeSection === item && (
                   <motion.div
@@ -498,9 +497,8 @@ const Portfolio = () => {
                   scrollToSection(item);
                   setIsMenuOpen(false);
                 }}
-                className={`px-4 py-3 text-left rounded-xl capitalize font-medium ${
-                  activeSection === item ? "bg-white/10 text-white" : "text-slate-400 hover:bg-white/5"
-                }`}
+                className={`px-4 py-3 text-left rounded-xl capitalize font-medium ${activeSection === item ? "bg-white/10 text-white" : "text-slate-400 hover:bg-white/5"
+                  }`}
               >
                 {item}
               </button>
@@ -537,7 +535,7 @@ const Portfolio = () => {
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-sm font-medium text-slate-300">Available for new opportunities</span>
           </motion.div>
-          
+
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -547,7 +545,7 @@ const Portfolio = () => {
             <span className="block mb-2 text-white">Hi, I&apos;m</span>
             <FallingTypewriterText text="Afolabi Temilade" />
           </motion.h1>
-          
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -556,7 +554,7 @@ const Portfolio = () => {
           >
             Crafting beautiful, high-performance web experiences with Python, Next.js, and cutting-edge technologies.
           </motion.p>
-          
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -588,7 +586,7 @@ const Portfolio = () => {
       <section id="about" className="py-24 px-4 relative">
         <div className="max-w-5xl mx-auto">
           <SectionHeader title="About Me" subtitle="A brief introduction to who I am and what I do" />
-          
+
           <div className="grid md:grid-cols-5 gap-8 items-center">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
@@ -599,21 +597,21 @@ const Portfolio = () => {
               <div className="relative group p-4">
                 {/* Glowing aura shadow */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-blue-500 rounded-full blur-3xl opacity-20 group-hover:opacity-50 transition-all duration-500 scale-90 group-hover:scale-100" />
-                
+
                 {/* Profile Picture Frame */}
                 <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-full overflow-hidden border-2 border-white/20 group-hover:border-white/40 ring-4 ring-black/50 transition-all duration-500 shadow-2xl z-10 bg-white">
-                  <Image 
-                    src="/media/headshot.jpeg" 
-                    alt="Afolabi Temilade" 
+                  <Image
+                    src="/media/headshot.jpeg"
+                    alt="Afolabi Temilade"
                     width={300}
                     height={300}
                     className="w-full h-full object-contain object-center transform group-hover:scale-105 transition-all duration-700 ease-out z-0"
                   />
-                  
+
                   {/* Internal shadow to give a sphere/3D inset feel */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity duration-500 z-10 pointer-events-none" />
                 </div>
-                
+
                 {/* Floating DP Status Badge overlapping the edge */}
                 <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-out z-20 whitespace-nowrap pointer-events-none">
                   <div className="px-5 py-2.5 bg-[#030305]/90 backdrop-blur-xl border border-white/20 rounded-full flex items-center gap-2 shadow-2xl transform hover:scale-105 transition-transform cursor-default pointer-events-auto">
@@ -623,7 +621,7 @@ const Portfolio = () => {
                 </div>
               </div>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -632,12 +630,12 @@ const Portfolio = () => {
             >
               <div className="glass-card p-8 rounded-3xl">
                 <p className="text-lg text-slate-300 leading-relaxed mb-6">
-                  As a full-stack developer, I specialize in building comprehensive web solutions using React and NextJS for frontend development, along with Python and FastAPI for robust backend systems. 
+                  As a full-stack developer, I specialize in building comprehensive web solutions using React and NextJS for frontend development, along with Python and FastAPI for robust backend systems.
                 </p>
                 <p className="text-lg text-slate-300 leading-relaxed">
                   My proven track record of collaborating with cross-functional teams and delivering high-quality applications makes me a valuable asset to any organization seeking to elevate their web development capabilities. When I am not coding, you can find me exploring new technologies or mentioning aspiring developers.
                 </p>
-                
+
                 <div className="mt-8 pt-8 border-t border-white/10 grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {[
                     { label: "Experience", value: "3+ Years" },
@@ -662,53 +660,54 @@ const Portfolio = () => {
       <section id="experience" className="py-24 px-4">
         <div className="max-w-4xl mx-auto">
           <SectionHeader title="Experience & Education" subtitle="My professional journey so far" />
-          
+
           <div className="relative border-l border-white/10 ml-4 md:ml-0 md:pl-0 space-y-12">
             {[
               {
                 role: "Backend Developer",
                 company: "Precious Cornerstone University • Ibadan, Nigeria",
-                date: "12/2025 – Current",
+                date: "12/2025 – 06/2026",
                 points: [
-                  "Created the backend server for admission portal.",
-                  "Enhanced system settings for the ICT dashboard e.g. created system lock for admission portal, result upload and course registration.",
-                  "Restructured their MSSQL database.",
-                  "Obtained and evaluated information on hardware configuration costs, reporting requirements and security needs.",
-                  "Improved and corrected existing software and system applications."
+                  "Architected and developed a multi-portal student management system covering applicant onboarding,admissions workflows, course registration, and document management for a Nigerian private university.",
+                  "Designed and managed a cloud PostgreSQL database, implementing authentication separation patterns,reference data seeding, and connection pooling strategies to mitigate serverless cold-start latency issues.",
+                  "Integrated Interswitch/Quickteller payment gateway using a redirect-based flow, diagnosing and resolving arace condition that caused incorrect payment status updates, and implementing a recovery script with dry-run support for safe reconciliation.",
+                  "Implemented JWT-secured document upload services with server-side image processing and enhancementusing Python and OpenCV.",
+                  "Configured transactional email delivery via Resend, implementing a DNS-agnostic workaround to bypassinstitutional domain restrictions.",
+                  "Deployed the system on a Hostinger VPS using Gunicorn and Nginx (with /e-portal routing), and managedprocess orchestration with PM2, establishing structured Git workflows across multiple deploymentenvironments.",
+                  "Optimized backend performance by analyzing Flask/Werkzeug logs, identifying redundant API calls andCORS preflight overhead, and improving request flow efficiency on the applicant dashboard."
+                ]
+              },
+              {
+                role: "Full Stack Developer",
+                company: "Freelance • Lagos, Nigeria",
+                date: "10/2024 – 10/2025",
+                points: [
+                  "Developed RESTful APIs to enable seamless integration between frontend applications and backendservices across client projects.",
+                  "Collaborated with frontend developers to deliver responsive, user-focused interfaces and improve overallapplication experience.",
+                  "Designed and implemented relational database solutions using MySQL, ensuring data consistency,scalability, and performance.",
+                  "Built and maintained efficient, reusable backend code to support multiple production features and clientrequirements.",
+                  "Created and optimized SQL scripts for data integrity, performance tuning, and reliable database operations.",
+                  "Developed custom middleware to handle cross-cutting concerns such as logging, error handling,authentication, and request validation, improving system reliability and maintainability."
                 ]
               },
               {
                 role: "Backend Developer",
-                company: "Vitesse • Lagos, Nigeria",
-                date: "08/2025 – 01/2026",
-                points: [
-                  "Developed RESTful APIs for seamless data integration.",
-                  "Collaborated with frontend teams to enhance user experience.",
-                  "Implemented database solutions using MySQL.",
-                  "Wrote efficient and maintainable code for backend systems.",
-                  "Created SQL scripts to maintain database integrity and performance.",
-                  "Developed custom middleware for handling cross-cutting concerns such as logging, error handling, and request validation."
-                ]
-              },
-              {
-                role: "Full Stack Web Developer",
                 company: "Private • Lagos, Nigeria",
-                date: "06/2024 – 10/2025",
+                date: "09/2024 – 01/2025",
                 points: [
-                  "Used React and Next.js to create a Point of Sale (POS) system for a restaurant and bar business.",
-                  "Applied security best practices in application development to safeguard against common vulnerabilities for both admin and waitstaff dashboard.",
-                  "Developed and maintained server-side applications using Node.js, enhancing application functionality and performance.",
-                  "Integrated payment tracking using Monnify."
+                  "Designed and built a production-grade backend for a restaurant Point of Sale (POS) system using Pythonand PostgreSQL, enabling end-to-end order processing and financial operations.",
+                  "Developed core modules for inventory management, sales tracking, and automated receipt generation toimprove operational efficiency.",
+                  "Integrated secure payment workflows and transaction reporting to support accurate reconciliation andreliable financial auditing."
                 ]
               },
               {
-                role: "Full Stack Web Developer",
+                role: "Full Stack Developer Intern",
                 company: "DakuGin Inc. • Lagos, Nigeria",
-                date: "04/2024 – 02/2025",
+                date: "03/2024 – 08/2024",
                 points: [
-                  "Developed a responsive web platform using JavaScript, HTML, and CSS for a market-days application.",
-                  "Utilized version control systems to manage code changes effectively.",
-                  "Contributed ideas towards improving usability of web application interfaces."
+                  "I developed a responsive web platform using JavaScript, HTML, and CSS for a market-days application.",
+                  "I utilized version control systems to manage code changes effectively.",
+                  "I also contributed ideas towards improving the usability of the web application."
                 ]
               },
               {
@@ -732,7 +731,7 @@ const Portfolio = () => {
               >
                 {/* Timeline dot */}
                 <div className="absolute left-[-5px] md:left-[-5px] top-1.5 w-3 h-3 bg-blue-500 rounded-full ring-4 ring-blue-500/20" />
-                
+
                 <div className="md:ml-12 glass-card p-6 md:p-8 rounded-2xl group hover:border-blue-500/30 transition-colors">
                   <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-2">
                     <div>
@@ -766,7 +765,7 @@ const Portfolio = () => {
       <section id="projects" className="py-24 px-4 relative z-10">
         <div className="max-w-6xl mx-auto">
           <SectionHeader title="Featured Projects" subtitle="A selection of my recent work" />
-          
+
           <div className="grid md:grid-cols-2 gap-6">
             {projects.map((project, idx) => (
               <motion.div
@@ -779,7 +778,7 @@ const Portfolio = () => {
               >
                 {/* Glow effect on hover */}
                 <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                
+
                 <div className="relative z-10 flex flex-col h-full">
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex items-center gap-4">
@@ -796,11 +795,11 @@ const Portfolio = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <p className="text-slate-300 text-sm leading-relaxed mb-6 flex-grow">
                     {project.description}
                   </p>
-                  
+
                   <div className="space-y-6 mt-auto">
                     <div className="flex flex-wrap gap-2">
                       {(project.tech_stack || project.tech || []).map((tech, i) => (
@@ -812,10 +811,10 @@ const Portfolio = () => {
 
                     <div className="flex items-center gap-4 pt-4 border-t border-white/5">
                       {project.demo_url && (
-                        <a 
-                          href={project.demo_url} 
-                          target="_blank" 
-                          rel="noreferrer" 
+                        <a
+                          href={project.demo_url}
+                          target="_blank"
+                          rel="noreferrer"
                           className="flex-1 flex items-center justify-center gap-2 py-3 bg-white text-black rounded-2xl font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-all"
                         >
                           <ExternalLink className="w-4 h-4" />
@@ -823,10 +822,10 @@ const Portfolio = () => {
                         </a>
                       )}
                       {project.github_url && (
-                        <a 
-                          href={project.github_url} 
-                          target="_blank" 
-                          rel="noreferrer" 
+                        <a
+                          href={project.github_url}
+                          target="_blank"
+                          rel="noreferrer"
                           className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/10 text-white rounded-2xl font-bold text-sm hover:bg-white/10 active:scale-[0.98] transition-all"
                         >
                           <Github className="w-4 h-4" />
@@ -846,7 +845,7 @@ const Portfolio = () => {
       <section id="skills" className="py-24 px-4">
         <div className="max-w-6xl mx-auto">
           <SectionHeader title="Technical Skills" subtitle="Technologies I frequently use" />
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {skills.map((skill, index) => (
               <motion.div
@@ -881,17 +880,16 @@ const Portfolio = () => {
       <section id="contact" className="py-24 px-4 relative">
         <div className="max-w-3xl mx-auto">
           <SectionHeader title="Let's Connect" subtitle="Ready to start your next project with me?" />
-          
+
           <div className="glass-card p-8 md:p-12 rounded-3xl">
             {contactStatus.message && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`mb-8 p-4 rounded-xl flex items-center space-x-3 text-sm font-medium border ${
-                  contactStatus.type === "success"
+                className={`mb-8 p-4 rounded-xl flex items-center space-x-3 text-sm font-medium border ${contactStatus.type === "success"
                     ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
                     : "bg-red-500/10 border-red-500/20 text-red-400"
-                }`}
+                  }`}
               >
                 {contactStatus.type === "success" ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
                 <span>{contactStatus.message}</span>
@@ -923,7 +921,7 @@ const Portfolio = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-400 ml-1">Message</label>
                 <textarea
@@ -936,28 +934,28 @@ const Portfolio = () => {
                 />
               </div>
 
-               <input type="text" name="honeypot" value={contactForm.honeypot} onChange={handleContactChange} className="hidden" tabIndex={-1} autoComplete="off" />
+              <input type="text" name="honeypot" value={contactForm.honeypot} onChange={handleContactChange} className="hidden" tabIndex={-1} autoComplete="off" />
 
-               <button
-                  onClick={handleContactSubmit}
-                  disabled={isSubmitting}
-                  className="w-full group relative overflow-hidden rounded-xl p-[1px] font-semibold"
-                >
-                  <span className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="relative bg-black/50 backdrop-blur-md px-6 py-4 rounded-xl flex items-center justify-center gap-2 border border-white/10 transition-colors group-hover:bg-black/20">
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin text-white" />
-                        <span className="text-white">Sending...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Mail className="w-5 h-5 text-white" />
-                        <span className="text-white">Send Message</span>
-                      </>
-                    )}
-                  </div>
-                </button>
+              <button
+                onClick={handleContactSubmit}
+                disabled={isSubmitting}
+                className="w-full group relative overflow-hidden rounded-xl p-[1px] font-semibold"
+              >
+                <span className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative bg-black/50 backdrop-blur-md px-6 py-4 rounded-xl flex items-center justify-center gap-2 border border-white/10 transition-colors group-hover:bg-black/20">
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin text-white" />
+                      <span className="text-white">Sending...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Mail className="w-5 h-5 text-white" />
+                      <span className="text-white">Send Message</span>
+                    </>
+                  )}
+                </div>
+              </button>
             </div>
           </div>
         </div>
