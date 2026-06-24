@@ -668,13 +668,13 @@ const Portfolio = () => {
                 company: "Precious Cornerstone University • Ibadan, Nigeria",
                 date: "12/2025 – 06/2026",
                 points: [
-                  "Architected and developed a multi-portal student management system covering applicant onboarding,admissions workflows, course registration, and document management for a Nigerian private university.",
-                  "Designed and managed a cloud PostgreSQL database, implementing authentication separation patterns,reference data seeding, and connection pooling strategies to mitigate serverless cold-start latency issues.",
-                  "Integrated Interswitch/Quickteller payment gateway using a redirect-based flow, diagnosing and resolving arace condition that caused incorrect payment status updates, and implementing a recovery script with dry-run support for safe reconciliation.",
-                  "Implemented JWT-secured document upload services with server-side image processing and enhancementusing Python and OpenCV.",
-                  "Configured transactional email delivery via Resend, implementing a DNS-agnostic workaround to bypassinstitutional domain restrictions.",
-                  "Deployed the system on a Hostinger VPS using Gunicorn and Nginx (with /e-portal routing), and managedprocess orchestration with PM2, establishing structured Git workflows across multiple deploymentenvironments.",
-                  "Optimized backend performance by analyzing Flask/Werkzeug logs, identifying redundant API calls andCORS preflight overhead, and improving request flow efficiency on the applicant dashboard."
+                  "Architected and developed a multi-portal student management system covering applicant onboarding, admissions workflows, course registration, and document management for a Nigerian private university.",
+                  "Designed and managed a cloud PostgreSQL database, implementing authentication separation patterns, reference data seeding, and connection pooling strategies to mitigate serverless cold-start latency issues.",
+                  "Integrated Interswitch/Quickteller payment gateway using a redirect-based flow, diagnosing and resolving a race condition that caused incorrect payment status updates, and implementing a recovery script with dry-run support for safe reconciliation.",
+                  "Implemented JWT-secured document upload services with server-side image processing and enhancement using Python and OpenCV.",
+                  "Configured transactional email delivery via Resend, implementing a DNS-agnostic workaround to bypass institutional domain restrictions.",
+                  "Deployed the system on a Hostinger VPS using Gunicorn and Nginx (with /e-portal routing), and managed process orchestration with PM2, establishing structured Git workflows across multiple deployment environments.",
+                  "Optimized backend performance by analyzing Flask/Werkzeug logs, identifying redundant API calls and CORS preflight overhead, and improving request flow efficiency on the applicant dashboard."
                 ]
               },
               {
@@ -682,12 +682,12 @@ const Portfolio = () => {
                 company: "Freelance • Lagos, Nigeria",
                 date: "10/2024 – 10/2025",
                 points: [
-                  "Developed RESTful APIs to enable seamless integration between frontend applications and backendservices across client projects.",
-                  "Collaborated with frontend developers to deliver responsive, user-focused interfaces and improve overallapplication experience.",
-                  "Designed and implemented relational database solutions using MySQL, ensuring data consistency,scalability, and performance.",
-                  "Built and maintained efficient, reusable backend code to support multiple production features and clientrequirements.",
+                  "Developed RESTful APIs to enable seamless integration between frontend applications and backend services across client projects.",
+                  "Collaborated with frontend developers to deliver responsive, user-focused interfaces and improve overall application experience.",
+                  "Designed and implemented relational database solutions using MySQL, ensuring data consistency, scalability, and performance.",
+                  "Built and maintained efficient, reusable backend code to support multiple production features and client requirements.",
                   "Created and optimized SQL scripts for data integrity, performance tuning, and reliable database operations.",
-                  "Developed custom middleware to handle cross-cutting concerns such as logging, error handling,authentication, and request validation, improving system reliability and maintainability."
+                  "Developed custom middleware to handle cross-cutting concerns such as logging, error handling, authentication, and request validation, improving system reliability and maintainability."
                 ]
               },
               {
